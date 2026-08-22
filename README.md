@@ -25,6 +25,18 @@ A high-performance **Retrieval-Augmented Generation (RAG)** system built to inge
 
 ---
 
+## 🌿 Git Branching Strategy (Git Flow)
+
+This repository strictly enforces an enterprise **Git Flow** branching model across three distinct branch tiers:
+
+| Branch Tier | Name Pattern | Purpose |
+| :--- | :--- | :--- |
+| **Production** | `main` | Production-ready, verified release code. |
+| **Integration** | `develop` | Primary development branch where feature branches are integrated and tested. |
+| **Feature** | `feature/<phase-name>` | Isolated feature development (e.g. `feature/phase-1-document-ingestion`, `feature/phase-2-text-chunking`). |
+
+---
+
 ## 📁 Repository Structure
 
 ```text
