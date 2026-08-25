@@ -36,6 +36,10 @@ venv.bak/
 .coverage
 htmlcov/
 
+# Personal Notes & Documents
+*.docx
+*.doc
+
 # Data & Output Files
 data/*.pdf
 !data/.gitkeep
