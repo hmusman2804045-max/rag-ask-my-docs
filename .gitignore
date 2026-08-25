@@ -36,9 +36,11 @@ venv.bak/
 .coverage
 htmlcov/
 
-# Personal Notes & Documents
+# Personal Notes & Planning Specs (Local Only)
 *.docx
 *.doc
+RAG_PROJECT_PRD.html
+*.html
 
 # Data & Output Files
 data/*.pdf
