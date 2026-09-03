@@ -46,11 +46,14 @@ def test_embed_payload_conversion():
 
     chunk1 = ChunkData(
         chunk_id="doc_chunk_000",
-        doc_name="test.pdf",
+        chunk_index=0,
         text="Sample paragraph for testing embedding payload.",
-        page_numbers=[1],
+        char_count=47,
+        word_count=6,
         start_char=0,
-        end_char=47
+        end_char=47,
+        doc_name="test.pdf",
+        page_numbers=[1]
     )
 
     chunk_payload = ChunkingPayload(
@@ -68,4 +71,4 @@ def test_embed_payload_conversion():
 
     e_chunk = embedded_payload.chunks[0]
     assert e_chunk.chunk_id == "doc_chunk_000"
-    assert len(e_chunk.embedding) == 384
+    assert len(e_chunk.vector) == 384
