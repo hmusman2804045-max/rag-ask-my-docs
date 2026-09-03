@@ -59,6 +59,8 @@ def test_embed_payload_conversion():
     chunk_payload = ChunkingPayload(
         doc_name="test.pdf",
         total_chunks=1,
+        total_chars=47,
+        avg_chunk_size=47.0,
         chunks=[chunk1]
     )
 
