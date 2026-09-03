@@ -45,6 +45,7 @@ RAG_PROJECT_PRD.html
 # Data & Output Files
 data/*.pdf
 !data/.gitkeep
+data/chroma_db/
 
 # IDEs
 .vscode/
