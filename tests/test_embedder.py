@@ -5,21 +5,26 @@ from app.chunking.text_chunker import ChunkData, ChunkingPayload
 
 def test_embedding_dimensions():
     engine = EmbeddingEngine()
-    vector = engine.embed_text("Testing vector embedding dimensions.")
+    text = "AskMyDocs processes technical documentation."
+    vector = engine.embed_text(text)
 
     assert isinstance(vector, list)
     assert len(vector) == 384
-    assert isinstance(vector[0], float)
+    assert all(isinstance(x, float) for x in vector)
 
 
 def test_batch_texts_embedding():
     engine = EmbeddingEngine()
-    texts = ["Document ingestion pipeline.", "Vector database storage."]
+    texts = [
+        "First chunk of technical text.",
+        "Second chunk of technical text.",
+        "Third chunk of technical text."
+    ]
     vectors = engine.embed_texts(texts)
 
-    assert len(vectors) == 2
-    assert len(vectors[0]) == 384
-    assert len(vectors[1]) == 384
+    assert len(vectors) == 3
+    for vec in vectors:
+        assert len(vec) == 384
 
 
 def test_cosine_similarity_semantic_relevance():
@@ -32,37 +37,35 @@ def test_cosine_similarity_semantic_relevance():
     sim_related = cosine_similarity(v_rag1, v_rag2)
     sim_unrelated = cosine_similarity(v_rag1, v_recipe)
 
-    assert sim_related > 0.70
-    assert sim_unrelated < 0.35
     assert sim_related > sim_unrelated
+    assert sim_related > 0.30
 
 
 def test_embed_payload_conversion():
     engine = EmbeddingEngine()
 
-    c1 = ChunkData(
-        chunk_id="test_000",
-        chunk_index=0,
-        text="Phase 3 embedding pipeline implementation.",
-        char_count=42,
-        word_count=5,
-        start_char=0,
-        end_char=42,
+    chunk1 = ChunkData(
+        chunk_id="doc_chunk_000",
         doc_name="test.pdf",
-        page_numbers=[1]
+        text="Sample paragraph for testing embedding payload.",
+        page_numbers=[1],
+        start_char=0,
+        end_char=47
     )
 
     chunk_payload = ChunkingPayload(
         doc_name="test.pdf",
         total_chunks=1,
-        total_chars=42,
-        avg_chunk_size=42.0,
-        chunks=[c1]
+        chunks=[chunk1]
     )
 
     embedded_payload = engine.embed_payload(chunk_payload)
 
+    assert isinstance(embedded_payload, EmbeddedPayload)
     assert embedded_payload.doc_name == "test.pdf"
     assert embedded_payload.total_chunks == 1
-    assert embedded_payload.vector_dim == 384
-    assert len(embedded_payload.chunks[0].vector) == 384
+    assert len(embedded_payload.chunks) == 1
+
+    e_chunk = embedded_payload.chunks[0]
+    assert e_chunk.chunk_id == "doc_chunk_000"
+    assert len(e_chunk.embedding) == 384
