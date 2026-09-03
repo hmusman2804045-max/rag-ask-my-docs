@@ -90,3 +90,11 @@ def test_memory_store_clear_history(memory_store):
     cleared_count = memory_store.clear_history(session_id, user_id)
     assert cleared_count == 2
     assert len(memory_store.get_chat_history(session_id, user_id)) == 0
+
+
+def test_memory_store_get_health(memory_store):
+    health = memory_store.get_health()
+    assert "mongodb_connected" in health
+    assert "using_fallback" in health
+    assert "fallback_session_count" in health
+    assert health["using_fallback"] is True

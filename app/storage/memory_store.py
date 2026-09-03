@@ -117,6 +117,13 @@ class MemoryStore:
             return count
         return 0
 
+    def get_health(self) -> Dict[str, Any]:
+        return {
+            "mongodb_connected": self.is_connected,
+            "using_fallback": not self.is_connected,
+            "fallback_session_count": len(self._fallback_store)
+        }
+
     def _save_to_fallback(self, session_id: str, user_id: str, record: Dict[str, Any]):
         key = f"{session_id}:{user_id}"
 
