@@ -63,7 +63,7 @@ def main():
     session_id = "demo_session_789"
     user_id = "demo_user_001"
 
-    print(f"    Saving User Message for session '{session_id}'...")
+    print(f"    Saving User Message for session '{session_id}' (User: {user_id})...")
     memory_store.save_message(
         session_id=session_id,
         user_id=user_id,
@@ -79,11 +79,11 @@ def main():
         content="Flow A extracts text and embeds chunks into Chroma DB. Flow B answers user questions."
     )
 
-    history = memory_store.get_chat_history(session_id, limit=5)
+    history = memory_store.get_chat_history(session_id, user_id, limit=5)
 
     print("\n--- Conversation History in MemoryStore ---")
     for msg in history:
-        print(f"[{msg['timestamp'][:19]}] {msg['role'].upper()}: {msg['content']}")
+        print(f"[{msg['timestamp'][:19]}] {msg['role'].upper()} ({msg['user_id']}): {msg['content']}")
 
     print("\n[+] Phase 4 Storage Integration Verification Complete!")
 
