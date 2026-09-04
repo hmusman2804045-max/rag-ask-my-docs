@@ -19,7 +19,11 @@
 
   body {
     background-color: #08090D;
-    @apply font-sans text-[15px] text-ink-100 antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #F8FAFC;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     /* Warm titanium ambience — amber at the horizon, never a flat black field. */
     background-image:
       radial-gradient(ellipse 120% 85% at 50% -18%, rgba(217, 119, 6, 0.3), transparent 62%),
@@ -41,8 +45,8 @@
   }
 
   *:focus-visible {
-    @apply outline-none ring-2 ring-gold-400/70 ring-offset-2;
-    --tw-ring-offset-color: #08090D;
+    outline: none;
+    box-shadow: 0 0 0 2px #08090D, 0 0 0 4px rgba(245, 158, 11, 0.7);
   }
 }
 
@@ -50,12 +54,17 @@
   /* Frosted titanium glass with a hairline gold edge. */
   .glass {
     background: rgba(17, 20, 31, 0.75);
-    @apply border border-gold-500/20 shadow-glass backdrop-blur-xl;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
   }
 
   .glass-subtle {
     background: rgba(13, 16, 26, 0.6);
-    @apply border border-white/5 backdrop-blur-xl;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
   }
 
   /* Faint engineering grid the 3D canvas sits inside. */
@@ -94,7 +103,7 @@
       rgba(245, 158, 11, 0) 100%
     );
     background-size: 200% 100%;
-    @apply animate-shimmer;
+    animation: shimmer 2.4s linear infinite;
   }
 
   /*
@@ -102,7 +111,7 @@
    * aligned without dropping into a retro monospace face.
    */
   .text-data {
-    font-family: Inter, system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.02em;
   }
