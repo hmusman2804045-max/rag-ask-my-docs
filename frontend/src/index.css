@@ -18,7 +18,8 @@
   }
 
   body {
-    @apply bg-titanium-900 font-sans text-[15px] text-ink-100 antialiased;
+    background-color: #08090D;
+    @apply font-sans text-[15px] text-ink-100 antialiased;
     /* Warm titanium ambience — amber at the horizon, never a flat black field. */
     background-image:
       radial-gradient(ellipse 120% 85% at 50% -18%, rgba(217, 119, 6, 0.3), transparent 62%),
@@ -31,7 +32,7 @@
   h1,
   h2,
   h3 {
-    @apply font-display;
+    font-family: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
   }
 
   ::selection {
@@ -40,7 +41,8 @@
   }
 
   *:focus-visible {
-    @apply outline-none ring-2 ring-gold-400/70 ring-offset-2 ring-offset-titanium-900;
+    @apply outline-none ring-2 ring-gold-400/70 ring-offset-2;
+    --tw-ring-offset-color: #08090D;
   }
 }
 
