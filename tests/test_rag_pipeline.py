@@ -61,3 +61,26 @@ def test_rag_pipeline_multi_turn_history(rag_pipeline):
     assert res2["history_used_count"] == 2
     history = rag_pipeline.memory_store.get_chat_history("sess_multi", "user_m")
     assert len(history) == 4
+
+
+def test_rag_pipeline_invalid_inputs(rag_pipeline):
+    with pytest.raises(ValueError, match="Question cannot be empty"):
+        rag_pipeline.ask("s1", "u1", "   ")
+
+    with pytest.raises(ValueError, match="session_id must be a non-empty string"):
+        rag_pipeline.ask("", "u1", "Valid question")
+
+    with pytest.raises(ValueError, match="Question length exceeds maximum"):
+        rag_pipeline.ask("s1", "u1", "A" * 2005)
+
+
+def test_rag_pipeline_memory_save_failure_resilience(rag_pipeline, monkeypatch):
+    def failing_save_message(*args, **kwargs):
+        raise RuntimeError("MongoDB connection timeout")
+
+    monkeypatch.setattr(rag_pipeline.memory_store, "save_message", failing_save_message)
+
+    res = rag_pipeline.ask("sess_fail", "user_fail", "Will this fail gracefully?")
+    assert res["question"] == "Will this fail gracefully?"
+    assert "answer" in res
+

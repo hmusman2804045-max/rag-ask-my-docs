@@ -34,7 +34,7 @@ class LLMEngine:
                 logger.warning(f"Failed to initialize Groq client: {err}. Operating in mock mode.")
                 self.is_mock_mode = True
         else:
-            logger.info("Groq API key missing or offline. LLMEngine operating in mock mode.")
+            logger.warning("Groq API key missing or invalid format. LLMEngine operating in mock mode.")
 
     def extract_citations(self, retrieved_chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         citations = []
@@ -98,7 +98,7 @@ class LLMEngine:
     ) -> Dict[str, Any]:
         user_msg = messages[-1]["content"] if messages else ""
 
-        if not chunks or any("No relevant document chunks" in user_msg for c in [1]):
+        if not chunks or "No relevant document chunks" in user_msg:
             answer = "I don't know based on the provided context."
         else:
             top_chunk = chunks[0]

@@ -1,9 +1,12 @@
+import logging
 from typing import Dict, Any, Optional
 from app.embeddings.embedder import EmbeddingEngine
 from app.storage.vector_store import VectorStore
 from app.storage.memory_store import MemoryStore
 from app.generation.prompt_builder import PromptBuilder
 from app.generation.llm_engine import LLMEngine
+
+logger = logging.getLogger(__name__)
 
 
 class RAGPipeline:
@@ -29,7 +32,16 @@ class RAGPipeline:
         n_chunks: int = 3,
         max_history_messages: int = 5
     ) -> Dict[str, Any]:
+        if not session_id or not str(session_id).strip():
+            raise ValueError("session_id must be a non-empty string.")
+        if not user_id or not str(user_id).strip():
+            raise ValueError("user_id must be a non-empty string.")
+        if not question or not str(question).strip():
+            raise ValueError("Question cannot be empty.")
+
         clean_question = question.strip()
+        if len(clean_question) > 2000:
+            raise ValueError("Question length exceeds maximum allowed limit of 2000 characters.")
 
         history = self.memory_store.get_chat_history(
             session_id=session_id,
@@ -54,18 +66,21 @@ class RAGPipeline:
             retrieved_chunks=retrieved_chunks
         )
 
-        self.memory_store.save_message(
-            session_id=session_id,
-            user_id=user_id,
-            role="user",
-            content=clean_question
-        )
-        self.memory_store.save_message(
-            session_id=session_id,
-            user_id=user_id,
-            role="assistant",
-            content=llm_response["answer"]
-        )
+        try:
+            self.memory_store.save_message(
+                session_id=session_id,
+                user_id=user_id,
+                role="user",
+                content=clean_question
+            )
+            self.memory_store.save_message(
+                session_id=session_id,
+                user_id=user_id,
+                role="assistant",
+                content=llm_response["answer"]
+            )
+        except Exception as err:
+            logger.error(f"Failed to persist chat message to MemoryStore: {err}")
 
         return {
             "question": clean_question,
@@ -79,3 +94,4 @@ class RAGPipeline:
             "usage": llm_response["usage"],
             "is_mock": llm_response["is_mock"]
         }
+

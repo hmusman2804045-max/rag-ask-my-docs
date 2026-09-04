@@ -63,3 +63,12 @@ def test_llm_engine_live_mode_if_key_present():
     if key and key.startswith("gsk_"):
         engine = LLMEngine()
         assert engine.is_mock_mode is False
+
+
+def test_llm_engine_mock_mode_warning_logging(caplog):
+    import logging
+    with caplog.at_level(logging.WARNING):
+        engine = LLMEngine(api_key="invalid_key")
+        assert engine.is_mock_mode is True
+        assert any("operating in mock mode" in record.message.lower() for record in caplog.records)
+
