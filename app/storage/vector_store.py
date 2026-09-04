@@ -111,6 +111,38 @@ class VectorStore:
 
         return formatted_results
 
+    def list_documents(self) -> List[Dict[str, Any]]:
+        """Aggregates indexed chunk metadata into a per-document summary listing."""
+        if self.collection.count() == 0:
+            return []
+
+        records = self.collection.get(include=["metadatas"])
+        metadatas = records.get("metadatas") or []
+
+        summaries: Dict[str, Dict[str, Any]] = {}
+        for meta in metadatas:
+            if not meta:
+                continue
+            doc_name = meta.get("doc_name", "unknown_doc")
+            entry = summaries.setdefault(doc_name, {
+                "doc_name": doc_name,
+                "chunk_count": 0,
+                "char_count": 0,
+                "word_count": 0,
+                "page_count": 0
+            })
+
+            entry["chunk_count"] += 1
+            entry["char_count"] += int(meta.get("char_count", 0) or 0)
+            entry["word_count"] += int(meta.get("word_count", 0) or 0)
+
+            pages_raw = str(meta.get("page_numbers", "") or "")
+            page_numbers = [int(p) for p in pages_raw.split(",") if p.strip().isdigit()]
+            if page_numbers:
+                entry["page_count"] = max(entry["page_count"], max(page_numbers))
+
+        return sorted(summaries.values(), key=lambda item: item["doc_name"])
+
     def delete_document(self, doc_name: str) -> int:
         existing = self.collection.get(where={"doc_name": doc_name})
         if existing and existing["ids"]:

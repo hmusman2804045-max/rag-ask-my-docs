@@ -25,6 +25,7 @@ class CitationModel(BaseModel):
     doc_name: str
     page_numbers: List[int]
     similarity_score: float
+    text_snippet: str = Field(default="", description="Raw retrieved chunk text used to ground the answer")
 
 
 class ChatAskResponse(BaseModel):
@@ -59,3 +60,23 @@ class HealthResponse(BaseModel):
     chroma_status: str
     groq_available: bool
     is_mock_mode: bool
+
+
+class IndexedDocumentModel(BaseModel):
+    doc_name: str = Field(..., description="Name of the indexed PDF document")
+    page_count: int = Field(..., description="Highest page number referenced by indexed chunks")
+    chunk_count: int = Field(..., description="Number of indexed chunks for this document")
+    char_count: int = Field(..., description="Total characters indexed for this document")
+    word_count: int = Field(..., description="Total words indexed for this document")
+
+
+class DocumentListResponse(BaseModel):
+    total_documents: int
+    total_chunks: int
+    documents: List[IndexedDocumentModel]
+
+
+class DocumentDeleteResponse(BaseModel):
+    status: str
+    doc_name: str
+    deleted_chunks_count: int

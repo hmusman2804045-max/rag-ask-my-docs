@@ -1,0 +1,302 @@
+import { useMemo, useRef, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
+import * as THREE from 'three';
+import { createGlowTexture, fibonacciSphere } from './textures';
+import type { CodexActivity, IndexedDocument } from '@/types';
+
+const VIOLET = '#7B2CBF';
+const VIOLET_LIGHT = '#9D4EDD';
+const GOLD = '#D4AF37';
+const AMBER = '#F4C430';
+
+/** Concentric golden rings — the outer shell of the codex. */
+const RINGS: { radius: number; tube: number; tilt: [number, number, number]; speed: number; color: string }[] = [
+  { radius: 1.68, tube: 0.016, tilt: [Math.PI / 2.1, 0, 0], speed: 0.24, color: GOLD },
+  { radius: 1.98, tube: 0.011, tilt: [Math.PI / 2.6, Math.PI / 5, 0], speed: -0.17, color: AMBER },
+  { radius: 2.32, tube: 0.008, tilt: [Math.PI / 3.4, -Math.PI / 6, Math.PI / 8], speed: 0.11, color: VIOLET_LIGHT },
+];
+
+function Core({ activity }: { activity: CodexActivity }) {
+  const shell = useRef<THREE.Mesh>(null);
+  const inner = useRef<THREE.Mesh>(null);
+  const halo = useRef<THREE.Sprite>(null);
+  const bloom = useRef<THREE.Sprite>(null);
+  const glow = useMemo(() => createGlowTexture('rgba(199,155,255,0.95)'), []);
+
+  useFrame((state, delta) => {
+    const t = state.clock.elapsedTime;
+    // Ingestion drives the core faster and brighter; retrieval gives it a slow, deliberate pulse.
+    const spin = activity === 'ingesting' ? 0.55 : activity === 'retrieving' ? 0.3 : 0.14;
+
+    if (shell.current) {
+      shell.current.rotation.y += delta * spin;
+      shell.current.rotation.x += delta * spin * 0.35;
+    }
+    if (inner.current) {
+      inner.current.rotation.y -= delta * spin * 0.6;
+      const pulse = 1 + Math.sin(t * (activity === 'idle' ? 1.2 : 2.6)) * 0.035;
+      inner.current.scale.setScalar(pulse);
+    }
+    if (halo.current) {
+      const base = activity === 'idle' ? 2.6 : 3.2;
+      halo.current.scale.setScalar(base + Math.sin(t * 1.8) * 0.18);
+    }
+    if (bloom.current) {
+      const base = activity === 'idle' ? 5.6 : 6.6;
+      bloom.current.scale.setScalar(base + Math.sin(t * 1.1) * 0.35);
+    }
+  });
+
+  return (
+    <group>
+      <sprite ref={bloom} scale={5.6}>
+        <spriteMaterial
+          map={glow}
+          color={VIOLET}
+          transparent
+          opacity={0.22}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </sprite>
+
+      <sprite ref={halo} scale={2.6}>
+        <spriteMaterial
+          map={glow}
+          color={VIOLET_LIGHT}
+          transparent
+          opacity={0.7}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </sprite>
+
+      <mesh ref={inner}>
+        <icosahedronGeometry args={[0.66, 1]} />
+        <meshStandardMaterial
+          color="#2A0B4D"
+          emissive={VIOLET}
+          emissiveIntensity={activity === 'idle' ? 0.75 : 1.6}
+          roughness={0.35}
+          metalness={0.55}
+          flatShading
+        />
+      </mesh>
+
+      <mesh ref={shell}>
+        <icosahedronGeometry args={[1.22, 2]} />
+        <meshBasicMaterial
+          color={VIOLET_LIGHT}
+          wireframe
+          transparent
+          opacity={activity === 'idle' ? 0.42 : 0.72}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+function Rings({ activity }: { activity: CodexActivity }) {
+  const group = useRef<THREE.Group>(null);
+  const refs = useRef<(THREE.Mesh | null)[]>([]);
+
+  useFrame((_, delta) => {
+    const boost = activity === 'idle' ? 1 : 1.9;
+    refs.current.forEach((mesh, index) => {
+      if (!mesh) return;
+      mesh.rotation.z += delta * RINGS[index].speed * boost;
+    });
+    if (group.current) group.current.rotation.y += delta * 0.05;
+  });
+
+  return (
+    <group ref={group}>
+      {RINGS.map((ring, index) => (
+        <mesh
+          key={ring.radius}
+          ref={(mesh) => {
+            refs.current[index] = mesh;
+          }}
+          rotation={ring.tilt}
+        >
+          <torusGeometry args={[ring.radius, ring.tube, 12, 160]} />
+          <meshBasicMaterial
+            color={ring.color}
+            transparent
+            opacity={activity === 'idle' ? 0.65 : 0.9}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/** Ambient constellation of embedding points drifting around the codex. */
+function Constellation({ count = 700 }: { count?: number }) {
+  const points = useRef<THREE.Points>(null);
+  const sprite = useMemo(() => createGlowTexture(), []);
+
+  const { positions, colors } = useMemo(() => {
+    const positionArray = new Float32Array(count * 3);
+    const colorArray = new Float32Array(count * 3);
+    const violet = new THREE.Color(VIOLET_LIGHT);
+    const gold = new THREE.Color(GOLD);
+
+    for (let i = 0; i < count; i += 1) {
+      const radius = 2.5 + Math.random() * 2.3;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+
+      positionArray[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      positionArray[i * 3 + 1] = radius * Math.cos(phi) * 0.7;
+      positionArray[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+
+      const tone = Math.random() > 0.72 ? gold : violet;
+      const shade = 0.45 + Math.random() * 0.55;
+      colorArray[i * 3] = tone.r * shade;
+      colorArray[i * 3 + 1] = tone.g * shade;
+      colorArray[i * 3 + 2] = tone.b * shade;
+    }
+
+    return { positions: positionArray, colors: colorArray };
+  }, [count]);
+
+  useFrame((state, delta) => {
+    if (!points.current) return;
+    points.current.rotation.y += delta * 0.035;
+    points.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.14) * 0.09;
+  });
+
+  return (
+    <points ref={points}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-color" args={[colors, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.075}
+        map={sprite}
+        vertexColors
+        transparent
+        opacity={0.85}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        sizeAttenuation
+      />
+    </points>
+  );
+}
+
+/** One node per indexed PDF, orbiting the codex and inspectable on hover. */
+function DocNode({
+  doc,
+  position,
+  index,
+}: {
+  doc: IndexedDocument;
+  position: [number, number, number];
+  index: number;
+}) {
+  const mesh = useRef<THREE.Mesh>(null);
+  const [hovered, setHovered] = useState(false);
+
+  useFrame((state, delta) => {
+    if (!mesh.current) return;
+    mesh.current.rotation.x += delta * 0.6;
+    mesh.current.rotation.y += delta * 0.4;
+    const bob = Math.sin(state.clock.elapsedTime * 0.9 + index) * 0.05;
+    mesh.current.position.y = position[1] + bob;
+    const target = hovered ? 1.9 : 1;
+    mesh.current.scale.lerp(new THREE.Vector3(target, target, target), 0.15);
+  });
+
+  return (
+    <group position={position}>
+      <mesh
+        ref={mesh}
+        onPointerOver={(event) => {
+          event.stopPropagation();
+          setHovered(true);
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          setHovered(false);
+          document.body.style.cursor = 'auto';
+        }}
+      >
+        <octahedronGeometry args={[0.085, 0]} />
+        <meshStandardMaterial
+          color={hovered ? AMBER : GOLD}
+          emissive={hovered ? AMBER : GOLD}
+          emissiveIntensity={hovered ? 2.4 : 1.1}
+          metalness={0.9}
+          roughness={0.2}
+        />
+      </mesh>
+
+      {hovered && (
+        <Html center distanceFactor={9} zIndexRange={[20, 0]}>
+          <div className="pointer-events-none -translate-y-10 whitespace-nowrap rounded-lg border border-champagne-500/30 bg-obsidian-900/90 px-3 py-2 text-[11px] shadow-gold backdrop-blur-xl">
+            <p className="font-medium text-ink-100">{doc.doc_name}</p>
+            <p className="mt-0.5 font-mono text-[10px] text-champagne-400">
+              {doc.page_count} pages · {doc.chunk_count} chunks
+            </p>
+          </div>
+        </Html>
+      )}
+    </group>
+  );
+}
+
+function DocNodes({ documents }: { documents: IndexedDocument[] }) {
+  const group = useRef<THREE.Group>(null);
+  const positions = useMemo(
+    () => fibonacciSphere(Math.max(documents.length, 1), 1.45),
+    [documents.length],
+  );
+
+  useFrame((_, delta) => {
+    if (group.current) group.current.rotation.y += delta * 0.12;
+  });
+
+  return (
+    <group ref={group}>
+      {documents.map((doc, index) => (
+        <DocNode
+          key={doc.doc_name}
+          doc={doc}
+          position={positions[index] ?? [0, 0, 0]}
+          index={index}
+        />
+      ))}
+    </group>
+  );
+}
+
+export function QuantumCodex({
+  activity,
+  documents,
+}: {
+  activity: CodexActivity;
+  documents: IndexedDocument[];
+}) {
+  const group = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    if (!group.current) return;
+    // A gentle parallax lean toward the pointer, so the codex feels physically present.
+    const { x, y } = state.pointer;
+    group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, x * 0.25, 0.04);
+    group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, -y * 0.18, 0.04);
+  });
+
+  return (
+    <group ref={group}>
+      <Core activity={activity} />
+      <Rings activity={activity} />
+      <DocNodes documents={documents} />
+      <Constellation />
+    </group>
+  );
+}

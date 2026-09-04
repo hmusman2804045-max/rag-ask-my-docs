@@ -46,7 +46,8 @@ async def ask_question(
                 chunk_id=c["chunk_id"],
                 doc_name=c["doc_name"],
                 page_numbers=c["page_numbers"],
-                similarity_score=c["similarity_score"]
+                similarity_score=c["similarity_score"],
+                text_snippet=c.get("text_snippet", "")
             )
             for c in res.get("citations", [])
         ]

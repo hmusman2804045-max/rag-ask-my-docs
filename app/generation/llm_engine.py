@@ -19,6 +19,7 @@ except ImportError:
 
 class LLMEngine:
     DEFAULT_MODEL = "openai/gpt-oss-20b"
+    MAX_CITATION_SNIPPET_CHARS = 600
 
     def __init__(self, api_key: Optional[str] = None, model: str = DEFAULT_MODEL):
         self.api_key = api_key or os.getenv("GROQ_API_KEY", "")
@@ -47,11 +48,16 @@ class LLMEngine:
             seen_chunks.add(chunk_id)
 
             meta = chunk.get("metadata", {})
+            snippet = str(chunk.get("text", "") or "").strip()
+            if len(snippet) > self.MAX_CITATION_SNIPPET_CHARS:
+                snippet = snippet[:self.MAX_CITATION_SNIPPET_CHARS].rstrip() + "..."
+
             citations.append({
                 "chunk_id": chunk_id,
                 "doc_name": meta.get("doc_name", "unknown_doc"),
                 "page_numbers": meta.get("page_numbers", []),
-                "similarity_score": chunk.get("similarity_score", 0.0)
+                "similarity_score": chunk.get("similarity_score", 0.0),
+                "text_snippet": snippet
             })
 
         return citations

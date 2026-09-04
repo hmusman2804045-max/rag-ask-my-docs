@@ -6,7 +6,12 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Request, Depends
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
-from app.api.schemas import DocumentUploadResponse
+from app.api.schemas import (
+    DocumentUploadResponse,
+    DocumentListResponse,
+    DocumentDeleteResponse,
+    IndexedDocumentModel
+)
 from app.api.dependencies import (
     get_pdf_extractor,
     get_chunker,
@@ -100,3 +105,56 @@ async def upload_document(
             detail=f"An error occurred while processing document: {err}"
         )
 
+
+
+@router.get(
+    "",
+    response_model=DocumentListResponse,
+    status_code=status.HTTP_200_OK,
+    summary="List Indexed Documents"
+)
+def list_documents(
+    vector_store: VectorStore = Depends(get_vector_store)
+) -> DocumentListResponse:
+    """Returns every PDF currently indexed in Chroma DB with its page, chunk and character totals."""
+    summaries = vector_store.list_documents()
+    documents = [IndexedDocumentModel(**summary) for summary in summaries]
+
+    return DocumentListResponse(
+        total_documents=len(documents),
+        total_chunks=sum(doc.chunk_count for doc in documents),
+        documents=documents
+    )
+
+
+@router.delete(
+    "/{doc_name}",
+    response_model=DocumentDeleteResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Delete Indexed Document"
+)
+def delete_document(
+    doc_name: str,
+    vector_store: VectorStore = Depends(get_vector_store)
+) -> DocumentDeleteResponse:
+    """Removes every indexed chunk belonging to the given document from Chroma DB."""
+    if not doc_name or not doc_name.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="doc_name cannot be empty."
+        )
+
+    deleted_count = vector_store.delete_document(doc_name)
+    if deleted_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No indexed document found with name '{doc_name}'."
+        )
+
+    logger.info(f"Deleted indexed document '{doc_name}' ({deleted_count} chunks removed).")
+
+    return DocumentDeleteResponse(
+        status="success",
+        doc_name=doc_name,
+        deleted_chunks_count=deleted_count
+    )
