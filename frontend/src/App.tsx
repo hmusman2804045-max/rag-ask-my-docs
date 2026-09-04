@@ -36,20 +36,22 @@ function CodexStage({
         expanded ? 'h-[min(44vh,21rem)]' : 'h-[min(22vh,10rem)]',
       )}
     >
+      {/* The canvas sits inside a faint engineering grid rather than on flat black. */}
+      <div className="pointer-events-none absolute inset-0 grid-glow" />
       <CodexCanvas />
 
       {/* Readability scrim so overlay chrome never fights the scene. */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-obsidian-900/70 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-obsidian-900/80 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-titanium-900/70 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-titanium-900/80 to-transparent" />
 
       <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-500">
+          <p className="font-display text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-500">
             Quantum codex
           </p>
           <p
             className={cn(
-              'mt-1 font-mono text-[11px]',
+              'mt-1 text-data text-[11px]',
               activity === 'idle' ? 'text-ink-400' : 'text-champagne-300',
             )}
           >
@@ -60,14 +62,14 @@ function CodexStage({
         <button
           type="button"
           onClick={onToggle}
-          className="pointer-events-auto rounded-lg border border-white/10 bg-obsidian-900/60 p-2 text-ink-400 backdrop-blur-xl transition-colors hover:border-champagne-500/40 hover:text-champagne-300"
+          className="pointer-events-auto rounded-lg border border-white/10 bg-titanium-900/60 p-2 text-ink-400 backdrop-blur-xl transition-colors hover:border-champagne-500/40 hover:text-champagne-300"
           aria-label={expanded ? 'Collapse the 3D stage' : 'Expand the 3D stage'}
         >
           {expanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
         </button>
       </div>
 
-      <p className="pointer-events-none absolute inset-x-0 bottom-0 p-4 text-center font-mono text-[10px] text-ink-500">
+      <p className="pointer-events-none absolute inset-x-0 bottom-0 p-4 text-center text-data text-[10px] text-ink-500">
         drag to orbit · scroll to zoom · {documents.length} doc-node
         {documents.length === 1 ? '' : 's'} in orbit
       </p>
@@ -107,7 +109,7 @@ export default function App() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setSidebarOpen(false)}
-                className="fixed inset-0 z-40 bg-obsidian-950/60 backdrop-blur-[2px] lg:hidden"
+                className="fixed inset-0 z-40 bg-titanium-950/60 backdrop-blur-[2px] lg:hidden"
               />
               <motion.div
                 initial={{ x: '-100%' }}

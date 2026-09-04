@@ -54,7 +54,7 @@ export function UploadZone() {
           'group relative mt-3 cursor-pointer overflow-hidden rounded-2xl border border-dashed p-5 transition-all duration-300',
           dragging
             ? 'border-champagne-400/70 bg-champagne-500/[0.07]'
-            : 'border-amethyst-500/30 bg-white/[0.02] hover:border-amethyst-400/60 hover:bg-amethyst-500/[0.06]',
+            : 'border-gold-500/30 bg-white/[0.02] hover:border-gold-400/60 hover:bg-gold-500/[0.06]',
           busy && 'cursor-wait',
         )}
       >
@@ -82,20 +82,20 @@ export function UploadZone() {
               'grid h-12 w-12 place-items-center rounded-xl border transition-colors',
               busy
                 ? 'border-champagne-500/40 bg-champagne-500/10'
-                : 'border-amethyst-400/30 bg-amethyst-500/10 group-hover:border-champagne-500/40',
+                : 'border-gold-400/30 bg-gold-500/10 group-hover:border-champagne-500/40',
             )}
           >
             {busy ? (
               <Loader2 className="h-5 w-5 animate-spin text-champagne-400" />
             ) : (
-              <UploadCloud className="h-5 w-5 text-amethyst-300 transition-colors group-hover:text-champagne-300" />
+              <UploadCloud className="h-5 w-5 text-gold-300 transition-colors group-hover:text-champagne-300" />
             )}
           </div>
 
-          <p className="mt-3 text-sm font-medium text-ink-100">
+          <p className="mt-3 text-base font-semibold text-ink-100">
             {busy ? PHASE_COPY[upload.phase] : 'Drop a PDF to index'}
           </p>
-          <p className="mt-1 text-[11px] text-ink-500">
+          <p className="mt-1 text-xs text-ink-400">
             {busy
               ? truncateMiddle(upload.fileName ?? '', 28)
               : 'or click to browse · PDF only · max 10 MB'}
@@ -105,7 +105,7 @@ export function UploadZone() {
             <div className="mt-4 w-full">
               <div className="h-1 w-full overflow-hidden rounded-full bg-white/5">
                 <motion.div
-                  className="h-full rounded-full bg-gradient-to-r from-amethyst-400 to-champagne-400"
+                  className="h-full rounded-full bg-gradient-to-r from-gold-400 to-champagne-400"
                   initial={{ width: 0 }}
                   animate={{
                     width: upload.phase === 'indexing' ? '100%' : `${upload.progress}%`,
@@ -113,7 +113,7 @@ export function UploadZone() {
                   transition={{ ease: 'easeOut', duration: 0.3 }}
                 />
               </div>
-              <p className="mt-2 font-mono text-[10px] text-ink-500">
+              <p className="mt-2 text-data text-xs text-ink-400">
                 {upload.phase === 'indexing'
                   ? 'Server-side vectorisation in progress…'
                   : `${upload.progress}% transferred`}
@@ -135,13 +135,13 @@ export function UploadZone() {
             <div className="mt-3 rounded-xl border border-champagne-500/20 bg-champagne-500/[0.05] p-3">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-champagne-400" />
-                <p className="min-w-0 flex-1 truncate text-xs font-medium text-ink-100">
+                <p className="min-w-0 flex-1 truncate text-xs font-semibold text-ink-100 sm:text-sm">
                   {upload.result.doc_name}
                 </p>
                 <button
                   type="button"
                   onClick={resetUpload}
-                  className="text-[10px] uppercase tracking-wider text-ink-500 transition-colors hover:text-champagne-300"
+                  className="text-xs uppercase tracking-wider text-ink-400 transition-colors hover:text-champagne-300"
                 >
                   Clear
                 </button>
@@ -168,8 +168,8 @@ export function UploadZone() {
             <div className="mt-3 flex items-start gap-2 rounded-xl border border-rose-500/25 bg-rose-500/[0.07] p-3">
               <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-rose-300" />
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-rose-200">Ingestion failed</p>
-                <p className="mt-1 break-words text-[11px] leading-relaxed text-rose-300/80">
+                <p className="text-sm font-medium text-rose-200">Ingestion failed</p>
+                <p className="mt-1 break-words text-xs leading-relaxed text-rose-300/80">
                   {upload.error}
                 </p>
               </div>

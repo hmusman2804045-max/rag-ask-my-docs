@@ -27,6 +27,9 @@ const IDLE_UPLOAD: UploadState = {
   error: null,
 };
 
+/** Pending timer that returns the 3D codex to its idle state after a retrieval. */
+let settleTimer = 0;
+
 function newSession(index: number): SessionSummary {
   const now = Date.now();
   return {
@@ -76,7 +79,7 @@ interface AppState {
 
   activeCitation: Citation | null;
   isInspectorOpen: boolean;
-  openCitation: (citation: Citation) => void;
+  openCitation: (citation: Citation, siblings?: Citation[]) => void;
   closeInspector: () => void;
 
   toasts: Toast[];
@@ -402,8 +405,10 @@ export const useAppStore = create<AppState>((set, get) => {
         }));
         get().pushToast({ tone: 'error', title: 'Request failed', description: message });
       } finally {
-        // Let the retrieval animation settle before the codex returns to rest.
-        window.setTimeout(() => set({ activity: 'idle' }), 2600);
+        // Keep the detangled chunk nodes on screen while the answer streams in,
+        // then let the codex settle back to rest.
+        window.clearTimeout(settleTimer);
+        settleTimer = window.setTimeout(() => set({ activity: 'idle' }), 8000);
       }
     },
 
@@ -418,7 +423,17 @@ export const useAppStore = create<AppState>((set, get) => {
 
     activeCitation: null,
     isInspectorOpen: false,
-    openCitation: (citation) => set({ activeCitation: citation, isInspectorOpen: true }),
+    /**
+     * Citations may be opened from any message in the feed, so the codex switches
+     * to that answer's chunk set — otherwise the highlighted node would belong to
+     * a different answer and report a different score.
+     */
+    openCitation: (citation, siblings) =>
+      set((state) => ({
+        activeCitation: citation,
+        isInspectorOpen: true,
+        lastCitations: siblings && siblings.length > 0 ? siblings : state.lastCitations,
+      })),
     closeInspector: () => set({ isInspectorOpen: false }),
 
     toasts: [],

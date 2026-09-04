@@ -16,8 +16,8 @@ const TONE = {
   },
   info: {
     icon: Info,
-    ring: 'border-amethyst-400/30',
-    color: 'text-amethyst-300',
+    ring: 'border-gold-400/30',
+    color: 'text-gold-300',
   },
 } as const;
 

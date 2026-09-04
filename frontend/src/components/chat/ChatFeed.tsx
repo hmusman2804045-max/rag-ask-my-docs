@@ -20,14 +20,14 @@ function EmptyState() {
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col items-center justify-center px-6 py-6 text-center"
     >
-      <div className="grid h-12 w-12 place-items-center rounded-2xl border border-champagne-500/25 bg-gradient-to-br from-amethyst-600/30 to-amethyst-800/30">
+      <div className="grid h-12 w-12 place-items-center rounded-2xl border border-champagne-500/25 bg-gradient-to-br from-gold-600/30 to-gold-800/30">
         <Sparkles className="h-5 w-5 text-champagne-400" />
       </div>
 
-      <h2 className="mt-4 text-base font-medium text-ink-100">
+      <h2 className="mt-4 font-display text-lg font-semibold text-ink-100 sm:text-xl">
         {documents.length === 0 ? 'The codex is empty' : 'Ask the codex'}
       </h2>
-      <p className="mt-1.5 max-w-sm text-[13px] leading-relaxed text-ink-400">
+      <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-400 sm:text-base">
         {documents.length === 0
           ? 'Drop a PDF into the ingestion panel. It will be extracted, chunked, embedded and indexed into the vector store.'
           : 'Every answer is grounded in retrieved chunks. Click any citation to inspect the exact source text.'}
@@ -40,7 +40,7 @@ function EmptyState() {
               key={suggestion}
               type="button"
               onClick={() => void askQuestion(suggestion)}
-              className="rounded-xl border border-white/8 bg-white/[0.02] px-3 py-2 text-[11px] text-ink-400 transition-all hover:border-amethyst-400/40 hover:bg-amethyst-500/10 hover:text-ink-100"
+              className="rounded-xl border border-white/8 bg-white/[0.02] px-3.5 py-2 text-xs font-medium text-ink-300 transition-all hover:border-gold-400/40 hover:bg-gold-500/10 hover:text-ink-100 sm:text-sm"
             >
               {suggestion}
             </button>
@@ -61,13 +61,13 @@ function RetrievalIndicator() {
       exit={{ opacity: 0, y: -6 }}
       className="flex items-center gap-3"
     >
-      <div className="relative mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-xl border border-champagne-500/30 bg-gradient-to-br from-amethyst-600/40 to-amethyst-800/40">
+      <div className="relative mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-xl border border-champagne-500/30 bg-gradient-to-br from-gold-600/40 to-gold-800/40">
         <span className="absolute inset-0 animate-pulse-ring rounded-xl border border-champagne-500/40" />
         <Radar className="h-3.5 w-3.5 animate-pulse text-champagne-400" />
       </div>
 
-      <div className="rounded-2xl rounded-tl-sm border border-white/10 bg-obsidian-700/65 px-4 py-3 backdrop-blur-xl">
-        <p className="text-[13px] text-ink-300">
+      <div className="rounded-2xl rounded-tl-sm border border-white/10 bg-titanium-700/65 px-4 py-3 backdrop-blur-xl">
+        <p className="text-sm text-ink-300 sm:text-base">
           Detangling {nChunks} chunk{nChunks === 1 ? '' : 's'} from the vector index…
         </p>
         <div className="mt-2 h-px w-48 shimmer-line" />

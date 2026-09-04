@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { createGlowTexture } from './textures';
+import { SCENE } from './palette';
 
 const SWEEP_TOP = 3.1;
 const SWEEP_BOTTOM = -3.1;
@@ -16,7 +17,7 @@ export function ScanBeam({ active }: { active: boolean }) {
   const blade = useRef<THREE.Mesh>(null);
   const wash = useRef<THREE.Sprite>(null);
   const opacity = useRef(0);
-  const glow = useMemo(() => createGlowTexture('rgba(244,196,48,0.95)'), []);
+  const glow = useMemo(() => createGlowTexture('rgba(245,158,11,0.95)'), []);
 
   useFrame((state, delta) => {
     opacity.current = THREE.MathUtils.lerp(opacity.current, active ? 1 : 0, 0.12);
@@ -40,7 +41,7 @@ export function ScanBeam({ active }: { active: boolean }) {
       <mesh ref={blade} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.1, 3.0, 96]} />
         <meshBasicMaterial
-          color="#F4C430"
+          color={SCENE.gold}
           transparent
           opacity={0}
           side={THREE.DoubleSide}
@@ -52,7 +53,7 @@ export function ScanBeam({ active }: { active: boolean }) {
       <sprite ref={wash} scale={6}>
         <spriteMaterial
           map={glow}
-          color="#F4C430"
+          color={SCENE.gold}
           transparent
           opacity={0}
           depthWrite={false}
@@ -70,7 +71,7 @@ export function ScanBeam({ active }: { active: boolean }) {
 export function IngestStream({ active }: { active: boolean }) {
   const points = useRef<THREE.Points>(null);
   const opacity = useRef(0);
-  const sprite = useMemo(() => createGlowTexture('rgba(199,155,255,0.95)'), []);
+  const sprite = useMemo(() => createGlowTexture('rgba(253,230,138,0.95)'), []);
 
   const { positions, seeds, origins } = useMemo(() => {
     const positionArray = new Float32Array(STREAM_COUNT * 3);
@@ -131,7 +132,7 @@ export function IngestStream({ active }: { active: boolean }) {
       <pointsMaterial
         size={0.09}
         map={sprite}
-        color="#C79BFF"
+        color={SCENE.champagne}
         transparent
         opacity={0}
         depthWrite={false}

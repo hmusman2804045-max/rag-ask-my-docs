@@ -21,7 +21,7 @@ export function DocumentList() {
     <section className="flex min-h-0 flex-1 flex-col">
       <div className="flex items-center justify-between px-1">
         <SectionLabel>Indexed repository</SectionLabel>
-        <span className="font-mono text-[10px] text-ink-500">
+        <span className="text-data text-xs text-ink-400">
           {isLoading ? '···' : `${documents.length} docs`}
         </span>
       </div>
@@ -36,8 +36,8 @@ export function DocumentList() {
 
         {!isLoading && documents.length === 0 && (
           <div className="rounded-xl border border-dashed border-white/10 p-4 text-center">
-            <p className="text-xs text-ink-400">No documents indexed yet.</p>
-            <p className="mt-1 text-[11px] text-ink-500">
+            <p className="text-sm text-ink-400">No documents indexed yet.</p>
+            <p className="mt-1 text-xs text-ink-500">
               Upload a PDF to give the codex something to reason over.
             </p>
           </div>
@@ -54,7 +54,7 @@ export function DocumentList() {
               transition={{ duration: 0.22 }}
               className={cn(
                 'group rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-colors',
-                'hover:border-amethyst-400/30 hover:bg-amethyst-500/[0.06]',
+                'hover:border-gold-400/30 hover:bg-gold-500/[0.06]',
                 pending === doc.doc_name && 'opacity-50',
               )}
             >
@@ -64,10 +64,10 @@ export function DocumentList() {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-medium text-ink-100" title={doc.doc_name}>
+                  <p className="truncate text-xs font-semibold text-ink-100 sm:text-sm" title={doc.doc_name}>
                     {truncateMiddle(doc.doc_name, 24)}
                   </p>
-                  <p className="mt-1 font-mono text-[10px] text-ink-500">
+                  <p className="mt-1 text-data text-xs text-ink-500">
                     {doc.page_count} pages · {doc.chunk_count} chunks ·{' '}
                     {formatNumber(doc.word_count)} words
                   </p>

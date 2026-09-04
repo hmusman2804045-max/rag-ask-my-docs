@@ -3,12 +3,9 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { createGlowTexture } from './textures';
+import { SCENE } from './palette';
 import { formatPercent, truncateMiddle } from '@/lib/utils';
 import type { Citation, CodexActivity } from '@/types';
-
-const GOLD = '#D4AF37';
-const AMBER = '#F4C430';
-const VIOLET_LIGHT = '#9D4EDD';
 
 const UP = new THREE.Vector3(0, 1, 0);
 
@@ -89,7 +86,7 @@ function ChunkNode({ citation, index, total, spawnRef, isActive, onSelect }: Chu
       <mesh ref={tether}>
         <cylinderGeometry args={[0.004, 0.012, 1, 6, 1, true]} />
         <meshBasicMaterial
-          color={isActive ? AMBER : VIOLET_LIGHT}
+          color={isActive ? SCENE.champagne : SCENE.gold}
           transparent
           opacity={isActive ? 0.55 : 0.28}
           depthWrite={false}
@@ -100,7 +97,7 @@ function ChunkNode({ citation, index, total, spawnRef, isActive, onSelect }: Chu
       <sprite ref={halo} scale={0.9}>
         <spriteMaterial
           map={glow}
-          color={isActive ? AMBER : GOLD}
+          color={isActive ? SCENE.champagne : SCENE.gold}
           transparent
           opacity={isActive ? 0.85 : 0.5}
           blending={THREE.AdditiveBlending}
@@ -126,21 +123,21 @@ function ChunkNode({ citation, index, total, spawnRef, isActive, onSelect }: Chu
       >
         <octahedronGeometry args={[0.13, 0]} />
         <meshStandardMaterial
-          color={isActive ? AMBER : GOLD}
-          emissive={isActive ? AMBER : GOLD}
+          color={isActive ? SCENE.champagne : SCENE.gold}
+          emissive={isActive ? SCENE.champagne : SCENE.gold}
           emissiveIntensity={isActive ? 3.2 : 1.6}
-          metalness={0.8}
+          metalness={0.85}
           roughness={0.15}
         />
       </mesh>
 
       {isActive && citation && (
         <Html center distanceFactor={8} zIndexRange={[20, 0]}>
-          <div className="pointer-events-none -translate-y-12 whitespace-nowrap rounded-lg border border-champagne-500/40 bg-obsidian-900/92 px-3 py-2 text-[11px] shadow-gold backdrop-blur-xl">
+          <div className="pointer-events-none -translate-y-12 whitespace-nowrap rounded-lg border border-champagne-300/50 bg-titanium-900/90 px-3 py-2 text-[11px] shadow-gold backdrop-blur-xl">
             <p className="font-medium text-champagne-300">
               {truncateMiddle(citation.doc_name, 24)}
             </p>
-            <p className="mt-0.5 font-mono text-[10px] text-ink-400">
+            <p className="mt-0.5 text-data text-[10px] text-ink-400">
               {formatPercent(citation.similarity_score)} match
             </p>
           </div>

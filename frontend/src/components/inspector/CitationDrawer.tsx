@@ -19,13 +19,13 @@ function Field({
   return (
     <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
       <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-ink-500">
-        <Icon className="h-3 w-3 text-amethyst-300" />
+        <Icon className="h-3 w-3 text-gold-300" />
         {label}
       </p>
       <p
         className={cn(
           'mt-1.5 break-words text-xs text-ink-100',
-          mono && 'font-mono text-[11px] text-champagne-300',
+          mono && 'text-data text-[11px] text-champagne-300',
         )}
       >
         {value}
@@ -59,7 +59,7 @@ export function CitationDrawer() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeInspector}
-            className="fixed inset-0 z-40 bg-obsidian-950/50 backdrop-blur-[2px] xl:hidden"
+            className="fixed inset-0 z-40 bg-titanium-950/50 backdrop-blur-[2px] xl:hidden"
           />
 
           <motion.aside
@@ -97,12 +97,12 @@ export function CitationDrawer() {
                     <Target className="h-3 w-3" />
                     Similarity score
                   </p>
-                  <p className="font-mono text-xl text-champagne-300">
+                  <p className="text-data text-xl text-champagne-300">
                     {formatPercent(citation.similarity_score)}
                   </p>
                 </div>
                 <ScoreBar score={citation.similarity_score} className="mt-3" />
-                <p className="mt-2 font-mono text-[10px] text-ink-500">
+                <p className="mt-2 text-data text-[10px] text-ink-500">
                   cosine similarity · {citation.similarity_score.toFixed(4)}
                 </p>
               </div>
@@ -116,9 +116,9 @@ export function CitationDrawer() {
 
               <div>
                 <SectionLabel className="px-1">Raw chunk text from Chroma</SectionLabel>
-                <div className="mt-2 rounded-xl border border-white/5 bg-obsidian-950/60 p-4">
+                <div className="mt-2 rounded-xl border border-white/5 bg-titanium-950/60 p-4">
                   {citation.text_snippet ? (
-                    <p className="whitespace-pre-wrap font-mono text-[11.5px] leading-relaxed text-ink-300">
+                    <p className="whitespace-pre-wrap text-data text-[11.5px] leading-relaxed text-ink-300">
                       {citation.text_snippet}
                     </p>
                   ) : (
@@ -140,15 +140,15 @@ export function CitationDrawer() {
                           key={item.chunk_id}
                           type="button"
                           onClick={() => openCitation(item)}
-                          className="flex w-full items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-2.5 text-left transition-all hover:border-amethyst-400/40 hover:bg-amethyst-500/[0.08]"
+                          className="flex w-full items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-2.5 text-left transition-all hover:border-gold-400/40 hover:bg-gold-500/[0.08]"
                         >
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-[11px] text-ink-300">{item.doc_name}</p>
-                            <p className="mt-0.5 font-mono text-[10px] text-ink-500">
+                            <p className="mt-0.5 text-data text-[10px] text-ink-500">
                               {formatPages(item.page_numbers)}
                             </p>
                           </div>
-                          <span className="font-mono text-[11px] text-champagne-400">
+                          <span className="text-data text-[11px] text-champagne-400">
                             {formatPercent(item.similarity_score)}
                           </span>
                         </button>

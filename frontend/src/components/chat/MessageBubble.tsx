@@ -5,7 +5,15 @@ import { useAppStore } from '@/store/useAppStore';
 import { cn, formatPages, formatPercent, truncateMiddle } from '@/lib/utils';
 import type { ChatMessage, Citation } from '@/types';
 
-function CitationTag({ citation, index }: { citation: Citation; index: number }) {
+function CitationTag({
+  citation,
+  index,
+  siblings,
+}: {
+  citation: Citation;
+  index: number;
+  siblings: Citation[];
+}) {
   const openCitation = useAppStore((state) => state.openCitation);
   const activeCitation = useAppStore((state) => state.activeCitation);
   const isInspectorOpen = useAppStore((state) => state.isInspectorOpen);
@@ -15,24 +23,24 @@ function CitationTag({ citation, index }: { citation: Citation; index: number })
   return (
     <motion.button
       type="button"
-      onClick={() => openCitation(citation)}
+      onClick={() => openCitation(citation, siblings)}
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 * index, duration: 0.25 }}
       className={cn(
-        'group inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 font-mono text-[10px] transition-all duration-200',
+        'group inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-data text-xs transition-all duration-200',
         isActive
-          ? 'border-champagne-400/60 bg-champagne-500/15 text-champagne-200 shadow-gold'
-          : 'border-amethyst-400/25 bg-amethyst-500/[0.08] text-ink-300 hover:border-champagne-500/40 hover:bg-champagne-500/10 hover:text-champagne-200',
+          ? 'border-champagne-300/60 bg-champagne-300/15 text-champagne-200 shadow-gold'
+          : 'border-gold-500/30 bg-gold-500/[0.1] text-champagne-300 shadow-[0_0_18px_-8px_rgba(245,158,11,0.7)] hover:border-gold-400/60 hover:bg-gold-500/[0.16] hover:text-champagne-200',
       )}
       title={`Inspect chunk ${citation.chunk_id}`}
     >
       <Quote className="h-2.5 w-2.5 opacity-70" />
       <span>{formatPages(citation.page_numbers)}</span>
-      <span className="text-ink-500">|</span>
+      <span className="text-gold-500/60">|</span>
       <span className="max-w-[9rem] truncate">{truncateMiddle(citation.doc_name, 18)}</span>
-      <span className="text-ink-500">|</span>
-      <span className={cn(citation.similarity_score >= 0.7 && 'text-champagne-300')}>
+      <span className="text-gold-500/60">|</span>
+      <span className={cn(citation.similarity_score >= 0.7 && 'text-champagne-200')}>
         {formatPercent(citation.similarity_score)} match
       </span>
     </motion.button>
@@ -63,7 +71,7 @@ export function MessageBubble({
             ? 'border-white/10 bg-white/[0.04]'
             : message.error
               ? 'border-rose-500/30 bg-rose-500/10'
-              : 'border-champagne-500/30 bg-gradient-to-br from-amethyst-600/40 to-amethyst-800/40',
+              : 'border-champagne-500/30 bg-gradient-to-br from-gold-600/40 to-gold-800/40',
         )}
       >
         {isUser ? (
@@ -80,14 +88,14 @@ export function MessageBubble({
           className={cn(
             'rounded-2xl border px-4 py-3 backdrop-blur-xl',
             isUser
-              ? 'rounded-tr-sm border-amethyst-400/25 bg-amethyst-500/[0.12]'
+              ? 'rounded-tr-sm border-gold-400/25 bg-gold-500/[0.12]'
               : message.error
                 ? 'rounded-tl-sm border-rose-500/25 bg-rose-500/[0.07]'
-                : 'rounded-tl-sm border-white/10 bg-obsidian-700/65',
+                : 'rounded-tl-sm border-white/10 bg-titanium-800/75',
           )}
         >
           {isUser ? (
-            <p className="whitespace-pre-wrap text-[13.5px] leading-relaxed text-ink-100">
+            <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-ink-100 sm:text-base">
               {message.content}
             </p>
           ) : (
@@ -102,13 +110,18 @@ export function MessageBubble({
         {!isUser && message.citations && message.citations.length > 0 && (
           <div className="mt-2.5 flex flex-wrap gap-1.5">
             {message.citations.map((citation, index) => (
-              <CitationTag key={citation.chunk_id} citation={citation} index={index} />
+              <CitationTag
+                key={citation.chunk_id}
+                citation={citation}
+                index={index}
+                siblings={message.citations ?? []}
+              />
             ))}
           </div>
         )}
 
         {!isUser && message.model && (
-          <p className="mt-2 font-mono text-[10px] text-ink-500">
+          <p className="mt-2 text-data text-xs text-ink-500">
             {message.model}
             {message.isMock && ' · mock mode'}
             {message.usage?.total_tokens ? ` · ${message.usage.total_tokens} tokens` : ''}

@@ -3,20 +3,59 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Activity, Database, HardDrive, RefreshCw, Sparkles } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { API_BASE_URL } from '@/lib/api';
-import { cn } from '@/lib/utils';
+import { cn, formatNumber } from '@/lib/utils';
 
-function StatusDot({ ok, pending }: { ok: boolean; pending?: boolean }) {
+type Tone = 'ok' | 'warn' | 'down' | 'pending';
+
+/** `chroma_status` arrives as "healthy (N vectors indexed)". */
+function parseVectorCount(status: string | undefined): number | null {
+  const match = status?.match(/(\d+)\s+vectors/);
+  return match ? Number(match[1]) : null;
+}
+
+function StatusDot({ tone }: { tone: Tone }) {
   return (
-    <span className="relative flex h-2 w-2">
-      {ok && !pending && (
+    <span className="relative flex h-1.5 w-1.5 shrink-0">
+      {tone === 'ok' && (
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
       )}
       <span
         className={cn(
-          'relative inline-flex h-2 w-2 rounded-full',
-          pending ? 'bg-ink-500' : ok ? 'bg-emerald-400' : 'bg-rose-400',
+          'relative inline-flex h-1.5 w-1.5 rounded-full',
+          tone === 'ok' && 'bg-emerald-400',
+          tone === 'warn' && 'bg-gold-400',
+          tone === 'down' && 'bg-rose-400',
+          tone === 'pending' && 'bg-ink-500',
         )}
       />
+    </span>
+  );
+}
+
+function Pill({ label, value, tone }: { label: string; value: string; tone: Tone }) {
+  return (
+    <span
+      className={cn(
+        'flex items-center gap-1.5 rounded-full border px-2.5 py-1',
+        tone === 'ok' && 'border-emerald-400/25 bg-emerald-400/[0.07]',
+        tone === 'warn' && 'border-gold-400/30 bg-gold-500/[0.08]',
+        tone === 'down' && 'border-rose-400/30 bg-rose-500/[0.08]',
+        tone === 'pending' && 'border-white/10 bg-white/[0.03]',
+      )}
+    >
+      <StatusDot tone={tone} />
+      <span className="text-[10px] uppercase tracking-wider text-ink-500">{label}</span>
+      <span
+        className={cn(
+          'text-data text-[11px] font-medium',
+          tone === 'ok' && 'text-emerald-300',
+          tone === 'warn' && 'text-champagne-300',
+          tone === 'down' && 'text-rose-300',
+          tone === 'pending' && 'text-ink-400',
+        )}
+      >
+        {value}
+      </span>
     </span>
   );
 }
@@ -35,15 +74,10 @@ function DetailRow({
   return (
     <div className="flex items-center justify-between gap-6 py-2">
       <span className="flex items-center gap-2 text-xs text-ink-400">
-        <Icon className="h-3.5 w-3.5 text-amethyst-300" />
+        <Icon className="h-3.5 w-3.5 text-gold-400" />
         {label}
       </span>
-      <span
-        className={cn(
-          'font-mono text-[11px]',
-          ok ? 'text-emerald-300' : 'text-champagne-400',
-        )}
-      >
+      <span className={cn('text-data text-[11px]', ok ? 'text-emerald-300' : 'text-champagne-300')}>
         {value}
       </span>
     </div>
@@ -59,33 +93,58 @@ export function HealthBadge() {
 
   const online = Boolean(health) && !healthError;
   const liveMode = Boolean(health && !health.is_mock_mode);
+  const vectorCount = parseVectorCount(health?.chroma_status);
+
+  const mongoTone: Tone = !online ? 'down' : health?.mongodb_connected ? 'ok' : 'warn';
+  const chromaTone: Tone = !online ? 'down' : 'ok';
+  const groqTone: Tone = !online ? 'down' : liveMode ? 'ok' : 'warn';
 
   return (
     <div className="relative">
       <div className="flex items-center gap-2">
+        {/* Full status pills once the header has room for them. */}
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+          aria-label="System health details"
+          className="glass hidden items-center gap-1.5 rounded-full px-2 py-1.5 transition-colors hover:border-gold-400/45 md:flex"
+        >
+          <Pill
+            label="Mongo"
+            value={!online ? 'offline' : health?.mongodb_connected ? 'atlas' : 'fallback'}
+            tone={mongoTone}
+          />
+          <Pill
+            label="Chroma"
+            value={vectorCount === null ? '—' : `${formatNumber(vectorCount)} vec`}
+            tone={chromaTone}
+          />
+          <Pill
+            label="Groq"
+            value={!online ? 'offline' : liveMode ? 'live' : 'mock'}
+            tone={groqTone}
+          />
+        </button>
+
+        {/* Compact summary on narrow screens. */}
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           className={cn(
-            'glass flex items-center gap-2.5 rounded-full px-3.5 py-2 text-xs transition-colors',
-            online ? 'hover:border-amethyst-400/40' : 'border-rose-500/30 hover:border-rose-400/50',
+            'glass flex items-center gap-2 rounded-full px-3 py-2 text-xs transition-colors md:hidden',
+            online ? 'hover:border-gold-400/45' : 'border-rose-500/30',
           )}
         >
-          <StatusDot ok={online} pending={isLoading && !health} />
-          <span className="font-medium text-ink-100">
-            {online ? 'System healthy' : isLoading ? 'Checking…' : 'API offline'}
-          </span>
-          <span className="h-3 w-px bg-white/10" />
+          <StatusDot tone={online ? 'ok' : isLoading ? 'pending' : 'down'} />
           <span
             className={cn(
-              'rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider',
-              liveMode
-                ? 'bg-champagne-500/15 text-champagne-300'
-                : 'bg-amethyst-500/20 text-amethyst-300',
+              'text-data text-[10px] font-semibold uppercase tracking-wider',
+              liveMode ? 'text-champagne-300' : 'text-gold-300',
             )}
           >
-            {liveMode ? 'Groq live' : 'Mock'}
+            {online ? (liveMode ? 'Groq live' : 'Mock') : 'Offline'}
           </span>
         </button>
 
@@ -109,10 +168,10 @@ export function HealthBadge() {
             className="glass absolute right-0 top-12 z-40 w-80 rounded-2xl p-4"
           >
             <div className="flex items-center justify-between">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-500">
+              <p className="font-display text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-500">
                 Service topology
               </p>
-              <span className="font-mono text-[10px] text-ink-500">{API_BASE_URL}</span>
+              <span className="text-data text-[10px] text-ink-500">{API_BASE_URL}</span>
             </div>
 
             <div className="my-3 h-px w-full gold-divider" />

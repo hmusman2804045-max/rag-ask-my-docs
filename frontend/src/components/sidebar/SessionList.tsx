@@ -53,14 +53,14 @@ export function SessionList() {
               className={cn(
                 'relative w-full rounded-xl border p-2.5 text-left transition-all duration-200',
                 isActive
-                  ? 'border-amethyst-400/40 bg-amethyst-500/10'
+                  ? 'border-gold-400/40 bg-gold-500/10'
                   : 'border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]',
               )}
             >
               {isActive && (
                 <motion.span
                   layoutId="active-session"
-                  className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-gradient-to-b from-champagne-400 to-amethyst-400"
+                  className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-gradient-to-b from-champagne-400 to-gold-400"
                 />
               )}
 
@@ -74,13 +74,13 @@ export function SessionList() {
                 <div className="min-w-0 flex-1">
                   <p
                     className={cn(
-                      'truncate text-xs',
-                      isActive ? 'font-medium text-ink-100' : 'text-ink-300',
+                      'truncate text-xs sm:text-sm',
+                      isActive ? 'font-semibold text-ink-100' : 'text-ink-300',
                     )}
                   >
                     {session.title}
                   </p>
-                  <p className="mt-0.5 font-mono text-[10px] text-ink-500">
+                  <p className="mt-0.5 text-data text-xs text-ink-500">
                     {formatRelativeTime(session.updatedAt)}
                     {session.messageCount > 0 && ` · ${session.messageCount} msgs`}
                   </p>

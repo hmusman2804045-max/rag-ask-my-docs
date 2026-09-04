@@ -1,28 +1,43 @@
 import { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
+import { Float, Html, Point, PointMaterial, Points } from '@react-three/drei';
 import * as THREE from 'three';
 import { createGlowTexture, fibonacciSphere } from './textures';
+import { SCENE } from './palette';
 import type { CodexActivity, IndexedDocument } from '@/types';
 
-const VIOLET = '#7B2CBF';
-const VIOLET_LIGHT = '#9D4EDD';
-const GOLD = '#D4AF37';
-const AMBER = '#F4C430';
-
 /** Concentric golden rings — the outer shell of the codex. */
-const RINGS: { radius: number; tube: number; tilt: [number, number, number]; speed: number; color: string }[] = [
-  { radius: 1.68, tube: 0.016, tilt: [Math.PI / 2.1, 0, 0], speed: 0.24, color: GOLD },
-  { radius: 1.98, tube: 0.011, tilt: [Math.PI / 2.6, Math.PI / 5, 0], speed: -0.17, color: AMBER },
-  { radius: 2.32, tube: 0.008, tilt: [Math.PI / 3.4, -Math.PI / 6, Math.PI / 8], speed: 0.11, color: VIOLET_LIGHT },
+const RINGS: {
+  radius: number;
+  tube: number;
+  tilt: [number, number, number];
+  speed: number;
+  color: string;
+}[] = [
+  { radius: 2.15, tube: 0.02, tilt: [Math.PI / 2.1, 0, 0], speed: 0.24, color: SCENE.gold },
+  {
+    radius: 2.52,
+    tube: 0.014,
+    tilt: [Math.PI / 2.6, Math.PI / 5, 0],
+    speed: -0.17,
+    color: SCENE.champagne,
+  },
+  {
+    radius: 2.95,
+    tube: 0.01,
+    tilt: [Math.PI / 3.4, -Math.PI / 6, Math.PI / 8],
+    speed: 0.11,
+    color: SCENE.amber,
+  },
 ];
 
 function Core({ activity }: { activity: CodexActivity }) {
   const shell = useRef<THREE.Mesh>(null);
   const inner = useRef<THREE.Mesh>(null);
+  const lattice = useRef<THREE.Mesh>(null);
   const halo = useRef<THREE.Sprite>(null);
   const bloom = useRef<THREE.Sprite>(null);
-  const glow = useMemo(() => createGlowTexture('rgba(199,155,255,0.95)'), []);
+  const glow = useMemo(() => createGlowTexture('rgba(253,230,138,0.95)'), []);
 
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
@@ -38,59 +53,80 @@ function Core({ activity }: { activity: CodexActivity }) {
       const pulse = 1 + Math.sin(t * (activity === 'idle' ? 1.2 : 2.6)) * 0.035;
       inner.current.scale.setScalar(pulse);
     }
+    if (lattice.current) {
+      lattice.current.rotation.y += delta * spin * 0.9;
+      lattice.current.rotation.z -= delta * spin * 0.4;
+    }
     if (halo.current) {
-      const base = activity === 'idle' ? 2.6 : 3.2;
-      halo.current.scale.setScalar(base + Math.sin(t * 1.8) * 0.18);
+      const base = activity === 'idle' ? 3.0 : 3.6;
+      halo.current.scale.setScalar(base + Math.sin(t * 1.8) * 0.2);
     }
     if (bloom.current) {
-      const base = activity === 'idle' ? 5.6 : 6.6;
-      bloom.current.scale.setScalar(base + Math.sin(t * 1.1) * 0.35);
+      const base = activity === 'idle' ? 7.5 : 8.8;
+      bloom.current.scale.setScalar(base + Math.sin(t * 1.1) * 0.45);
     }
   });
 
   return (
     <group>
-      <sprite ref={bloom} scale={5.6}>
+      <sprite ref={bloom} scale={7.5}>
         <spriteMaterial
           map={glow}
-          color={VIOLET}
+          color={SCENE.amber}
           transparent
-          opacity={0.22}
+          opacity={0.18}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
       </sprite>
 
-      <sprite ref={halo} scale={2.6}>
+      <sprite ref={halo} scale={3.0}>
         <spriteMaterial
           map={glow}
-          color={VIOLET_LIGHT}
+          color={SCENE.gold}
           transparent
-          opacity={0.7}
+          opacity={0.45}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
       </sprite>
 
+      {/* Faceted amber core — lit metal, not a flat fill. */}
       <mesh ref={inner}>
-        <icosahedronGeometry args={[0.66, 1]} />
+        <icosahedronGeometry args={[0.72, 1]} />
         <meshStandardMaterial
-          color="#2A0B4D"
-          emissive={VIOLET}
-          emissiveIntensity={activity === 'idle' ? 0.75 : 1.6}
-          roughness={0.35}
-          metalness={0.55}
+          color="#8A3D07"
+          emissive={SCENE.amber}
+          emissiveIntensity={activity === 'idle' ? 0.5 : 1.15}
+          roughness={0.28}
+          metalness={0.95}
           flatShading
         />
       </mesh>
 
-      <mesh ref={shell}>
-        <icosahedronGeometry args={[1.22, 2]} />
+      {/* Inner champagne lattice, for depth between core and shell. */}
+      <mesh ref={lattice}>
+        <icosahedronGeometry args={[1.18, 1]} />
         <meshBasicMaterial
-          color={VIOLET_LIGHT}
+          color={SCENE.champagne}
           wireframe
           transparent
-          opacity={activity === 'idle' ? 0.42 : 0.72}
+          opacity={activity === 'idle' ? 0.16 : 0.3}
+        />
+      </mesh>
+
+      {/* Golden metallic wireframe shell. */}
+      <mesh ref={shell}>
+        <icosahedronGeometry args={[1.62, 2]} />
+        <meshStandardMaterial
+          color={SCENE.gold}
+          emissive={SCENE.gold}
+          emissiveIntensity={activity === 'idle' ? 0.55 : 1.05}
+          metalness={0.85}
+          roughness={0.15}
+          wireframe
+          transparent
+          opacity={activity === 'idle' ? 0.7 : 0.95}
         />
       </mesh>
     </group>
@@ -121,10 +157,14 @@ function Rings({ activity }: { activity: CodexActivity }) {
           rotation={ring.tilt}
         >
           <torusGeometry args={[ring.radius, ring.tube, 12, 160]} />
-          <meshBasicMaterial
+          <meshStandardMaterial
             color={ring.color}
+            emissive={ring.color}
+            emissiveIntensity={activity === 'idle' ? 0.8 : 1.4}
+            metalness={0.85}
+            roughness={0.15}
             transparent
-            opacity={activity === 'idle' ? 0.65 : 0.9}
+            opacity={activity === 'idle' ? 0.8 : 1}
           />
         </mesh>
       ))}
@@ -132,16 +172,16 @@ function Rings({ activity }: { activity: CodexActivity }) {
   );
 }
 
-/** Ambient constellation of embedding points drifting around the codex. */
-function Constellation({ count = 700 }: { count?: number }) {
+/** Orbiting field of golden dust — the embedding space around the codex. */
+function GoldDust({ count = 700 }: { count?: number }) {
   const points = useRef<THREE.Points>(null);
   const sprite = useMemo(() => createGlowTexture(), []);
 
   const { positions, colors } = useMemo(() => {
     const positionArray = new Float32Array(count * 3);
     const colorArray = new Float32Array(count * 3);
-    const violet = new THREE.Color(VIOLET_LIGHT);
-    const gold = new THREE.Color(GOLD);
+    const gold = new THREE.Color(SCENE.gold);
+    const champagne = new THREE.Color(SCENE.champagne);
 
     for (let i = 0; i < count; i += 1) {
       const radius = 2.5 + Math.random() * 2.3;
@@ -152,8 +192,8 @@ function Constellation({ count = 700 }: { count?: number }) {
       positionArray[i * 3 + 1] = radius * Math.cos(phi) * 0.7;
       positionArray[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
 
-      const tone = Math.random() > 0.72 ? gold : violet;
-      const shade = 0.45 + Math.random() * 0.55;
+      const tone = Math.random() > 0.65 ? champagne : gold;
+      const shade = 0.5 + Math.random() * 0.5;
       colorArray[i * 3] = tone.r * shade;
       colorArray[i * 3 + 1] = tone.g * shade;
       colorArray[i * 3 + 2] = tone.b * shade;
@@ -179,12 +219,46 @@ function Constellation({ count = 700 }: { count?: number }) {
         map={sprite}
         vertexColors
         transparent
-        opacity={0.85}
+        opacity={0.9}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
         sizeAttenuation
       />
     </points>
+  );
+}
+
+/** A few brighter motes floating on their own, for depth beyond the dust shell. */
+function DriftingMotes() {
+  const motes = useMemo(
+    () =>
+      Array.from({ length: 24 }, (_, index) => ({
+        position: [
+          (Math.random() - 0.5) * 9,
+          (Math.random() - 0.5) * 5,
+          (Math.random() - 0.5) * 6,
+        ] as [number, number, number],
+        color: index % 3 === 0 ? SCENE.champagne : SCENE.gold,
+      })),
+    [],
+  );
+
+  return (
+    <Float speed={1.1} rotationIntensity={0.2} floatIntensity={1.4}>
+      <Points limit={motes.length}>
+        <PointMaterial
+          transparent
+          vertexColors
+          size={0.11}
+          sizeAttenuation
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+        {motes.map((mote, index) => (
+          <Point key={index} position={mote.position} color={mote.color} />
+        ))}
+      </Points>
+    </Float>
   );
 }
 
@@ -227,19 +301,19 @@ function DocNode({
       >
         <octahedronGeometry args={[0.085, 0]} />
         <meshStandardMaterial
-          color={hovered ? AMBER : GOLD}
-          emissive={hovered ? AMBER : GOLD}
-          emissiveIntensity={hovered ? 2.4 : 1.1}
-          metalness={0.9}
-          roughness={0.2}
+          color={hovered ? SCENE.champagne : SCENE.gold}
+          emissive={hovered ? SCENE.champagne : SCENE.gold}
+          emissiveIntensity={hovered ? 2.6 : 1.3}
+          metalness={0.85}
+          roughness={0.15}
         />
       </mesh>
 
       {hovered && (
         <Html center distanceFactor={9} zIndexRange={[20, 0]}>
-          <div className="pointer-events-none -translate-y-10 whitespace-nowrap rounded-lg border border-champagne-500/30 bg-obsidian-900/90 px-3 py-2 text-[11px] shadow-gold backdrop-blur-xl">
+          <div className="pointer-events-none -translate-y-10 whitespace-nowrap rounded-lg border border-gold-500/40 bg-titanium-900/90 px-3 py-2 text-[11px] shadow-gold backdrop-blur-xl">
             <p className="font-medium text-ink-100">{doc.doc_name}</p>
-            <p className="mt-0.5 font-mono text-[10px] text-champagne-400">
+            <p className="mt-0.5 text-data text-[10px] text-champagne-300">
               {doc.page_count} pages · {doc.chunk_count} chunks
             </p>
           </div>
@@ -293,10 +367,13 @@ export function QuantumCodex({
 
   return (
     <group ref={group}>
-      <Core activity={activity} />
-      <Rings activity={activity} />
-      <DocNodes documents={documents} />
-      <Constellation />
+      <Float speed={1.4} rotationIntensity={0.15} floatIntensity={0.5}>
+        <Core activity={activity} />
+        <Rings activity={activity} />
+        <DocNodes documents={documents} />
+      </Float>
+      <GoldDust />
+      <DriftingMotes />
     </group>
   );
 }

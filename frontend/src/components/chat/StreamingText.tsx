@@ -46,7 +46,7 @@ export function StreamingText({
   const isTyping = visibleCount < text.length;
 
   return (
-    <p className="whitespace-pre-wrap text-[13.5px] leading-relaxed text-ink-100">
+    <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-ink-100 sm:text-base">
       {text.slice(0, visibleCount)}
       {isTyping && (
         <span className="ml-0.5 inline-block h-[1.05em] w-[2px] translate-y-[2px] animate-pulse bg-champagne-400 align-middle" />

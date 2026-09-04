@@ -47,6 +47,7 @@ An enterprise-grade, modular **Retrieval-Augmented Generation (RAG)** system des
 - **Dense Embeddings (`Phase 3`)**: 384-dimensional dense vector embeddings generated via `sentence-transformers` (`all-MiniLM-L6-v2`).
 - **Persistent Vector & Memory Storage (`Phase 4`)**: Persistent Chroma DB ANN vector search with HNSW Cosine indexing + MongoDB Atlas conversation memory with in-memory fallback.
 - **Grounded LLM Generation & Citations (`Phase 5`)**: Groq API integration (`llama-3.1-8b-instant`) with system grounding, citation extraction, multi-turn context memory, and offline mock execution mode.
+- **REST API & 3D Web UI (`Phase 6`)**: FastAPI server with rate limiting and CORS, plus a React + Three.js client that renders the retrieval pipeline as an interactive 3D codex.
 
 ---
 
@@ -79,6 +80,42 @@ python scripts/run_phase5_demo.py
 
 ---
 
+## 🌐 REST API & Web UI
+
+Start the API server:
+
+```bash
+python scripts/run_api_server.py
+```
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/health` | MongoDB, Chroma and Groq readiness |
+| `GET` | `/api/v1/documents` | List indexed documents with page/chunk/char totals |
+| `POST` | `/api/v1/documents/upload` | Ingest a PDF (`multipart/form-data`, 5/min) |
+| `DELETE` | `/api/v1/documents/{doc_name}` | Purge a document from the vector index |
+| `POST` | `/api/v1/chat/ask` | Ask a question; returns the answer with citations (15/min) |
+| `GET` | `/api/v1/chat/history/{session_id}` | Fetch stored conversation turns |
+| `DELETE` | `/api/v1/chat/history/{session_id}` | Clear a session |
+
+Interactive OpenAPI docs live at `http://127.0.0.1:8000/docs`.
+
+Then start the **Neural Codex** frontend in a second terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The UI runs on `http://localhost:5173` and renders the pipeline as a 3D scene: a
+laser sweeps the codex during ingestion, retrieved chunks detangle from its core
+when a question is asked, and clicking a citation opens a source inspector showing
+the exact chunk text from Chroma. See [`frontend/README.md`](frontend/README.md)
+for details.
+
+---
+
 ## 🛣️ Development Roadmap
 
 - [x] **Phase 1**: Secure PDF Ingestion Engine
@@ -86,4 +123,4 @@ python scripts/run_phase5_demo.py
 - [x] **Phase 3**: Vector Embeddings Engine
 - [x] **Phase 4**: Chroma DB & MongoDB MemoryStore Integration
 - [x] **Phase 5**: LLM Generation & Grounding with Memory Context (Groq Llama 3.1 8B)
-- [ ] **Phase 6**: REST API Server (FastAPI) & Web UI Frontend
+- [x] **Phase 6**: REST API Server (FastAPI) & 3D Web UI Frontend (React + Three.js)

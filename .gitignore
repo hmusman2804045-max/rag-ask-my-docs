@@ -41,6 +41,7 @@ htmlcov/
 *.doc
 RAG_PROJECT_PRD.html
 *.html
+!frontend/**/*.html
 scratch/
 
 # Data & Output Files
@@ -53,3 +54,8 @@ data/chroma_db/
 .idea/
 *.swp
 *.swo
+
+# Frontend (Node)
+node_modules/
+frontend/dist/
+frontend/tsconfig.tsbuildinfo
