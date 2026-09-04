@@ -18,7 +18,7 @@ except ImportError:
 
 
 class LLMEngine:
-    DEFAULT_MODEL = "llama-3.1-8b-instant"
+    DEFAULT_MODEL = "openai/gpt-oss-20b"
 
     def __init__(self, api_key: Optional[str] = None, model: str = DEFAULT_MODEL):
         self.api_key = api_key or os.getenv("GROQ_API_KEY", "")
