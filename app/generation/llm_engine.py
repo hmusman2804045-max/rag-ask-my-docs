@@ -2,6 +2,12 @@ import logging
 import os
 from typing import List, Dict, Any, Optional
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 logger = logging.getLogger(__name__)
 
 try:
