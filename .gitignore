@@ -41,6 +41,7 @@ htmlcov/
 *.doc
 RAG_PROJECT_PRD.html
 *.html
+scratch/
 
 # Data & Output Files
 data/*.pdf
