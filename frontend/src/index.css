@@ -8,7 +8,7 @@
   }
 
   html {
-    font-size: 16.5px;
+    font-size: 14px;
   }
 
   html,
@@ -21,7 +21,7 @@
     background-color: #08090D;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     color: #F8FAFC;
-    font-size: 15px;
+    font-size: 14px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     /* Warm titanium ambience — amber at the horizon, never a flat black field. */

@@ -71,7 +71,7 @@ export function CodexCanvas() {
   return (
     <CanvasBoundary fallback={<StaticCodex />}>
       <Canvas
-        camera={{ position: [0, 0.4, 4.2], fov: 46 }}
+        camera={{ position: [0, 0.15, 5.0], fov: 44 }}
         dpr={[1, 1.8]}
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
         className="!absolute inset-0"

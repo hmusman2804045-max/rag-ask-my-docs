@@ -33,7 +33,7 @@ function CodexStage({
       transition={{ type: 'spring', stiffness: 200, damping: 30 }}
       className={cn(
         'glass relative overflow-hidden rounded-2xl',
-        expanded ? 'h-[min(44vh,21rem)]' : 'h-[min(22vh,10rem)]',
+        expanded ? 'h-48 sm:h-56' : 'h-24 sm:h-28',
       )}
     >
       {/* The canvas sits inside a faint engineering grid rather than on flat black. */}

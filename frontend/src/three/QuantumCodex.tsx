@@ -14,17 +14,17 @@ const RINGS: {
   speed: number;
   color: string;
 }[] = [
-  { radius: 2.15, tube: 0.02, tilt: [Math.PI / 2.1, 0, 0], speed: 0.24, color: SCENE.gold },
+  { radius: 1.52, tube: 0.016, tilt: [Math.PI / 2.1, 0, 0], speed: 0.24, color: SCENE.gold },
   {
-    radius: 2.52,
-    tube: 0.014,
+    radius: 1.88,
+    tube: 0.012,
     tilt: [Math.PI / 2.6, Math.PI / 5, 0],
     speed: -0.17,
     color: SCENE.champagne,
   },
   {
-    radius: 2.95,
-    tube: 0.01,
+    radius: 2.22,
+    tube: 0.009,
     tilt: [Math.PI / 3.4, -Math.PI / 6, Math.PI / 8],
     speed: 0.11,
     color: SCENE.amber,
@@ -69,7 +69,7 @@ function Core({ activity }: { activity: CodexActivity }) {
 
   return (
     <group>
-      <sprite ref={bloom} scale={7.5}>
+      <sprite ref={bloom} scale={5.5}>
         <spriteMaterial
           map={glow}
           color={SCENE.amber}
@@ -80,7 +80,7 @@ function Core({ activity }: { activity: CodexActivity }) {
         />
       </sprite>
 
-      <sprite ref={halo} scale={3.0}>
+      <sprite ref={halo} scale={2.2}>
         <spriteMaterial
           map={glow}
           color={SCENE.gold}
@@ -93,7 +93,7 @@ function Core({ activity }: { activity: CodexActivity }) {
 
       {/* Faceted amber core — lit metal, not a flat fill. */}
       <mesh ref={inner}>
-        <icosahedronGeometry args={[0.72, 1]} />
+        <icosahedronGeometry args={[0.52, 1]} />
         <meshStandardMaterial
           color="#8A3D07"
           emissive={SCENE.amber}
@@ -106,7 +106,7 @@ function Core({ activity }: { activity: CodexActivity }) {
 
       {/* Inner champagne lattice, for depth between core and shell. */}
       <mesh ref={lattice}>
-        <icosahedronGeometry args={[1.18, 1]} />
+        <icosahedronGeometry args={[0.84, 1]} />
         <meshBasicMaterial
           color={SCENE.champagne}
           wireframe
@@ -117,7 +117,7 @@ function Core({ activity }: { activity: CodexActivity }) {
 
       {/* Golden metallic wireframe shell. */}
       <mesh ref={shell}>
-        <icosahedronGeometry args={[1.62, 2]} />
+        <icosahedronGeometry args={[1.18, 2]} />
         <meshStandardMaterial
           color={SCENE.gold}
           emissive={SCENE.gold}
