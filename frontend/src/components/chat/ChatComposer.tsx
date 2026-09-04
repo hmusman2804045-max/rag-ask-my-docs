@@ -22,23 +22,23 @@ function Stepper({
 }) {
   return (
     <div className="flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.02] px-2 py-1">
-      <Icon className="h-3 w-3 text-gold-300" />
-      <span className="text-xs uppercase tracking-wider text-ink-500">{label}</span>
+      <Icon className="h-3.5 w-3.5 text-gold-300" />
+      <span className="text-xs font-semibold uppercase tracking-wider text-slate-300">{label}</span>
       <button
         type="button"
         onClick={() => onChange(value - 1)}
         disabled={value <= min}
-        className="px-1 text-ink-400 transition-colors hover:text-champagne-300 disabled:opacity-30"
+        className="px-1 text-slate-300 transition-colors hover:text-champagne-300 disabled:opacity-30"
         aria-label={`Decrease ${label}`}
       >
         –
       </button>
-      <span className="w-5 text-center text-data text-xs font-semibold text-champagne-300">{value}</span>
+      <span className="w-5 text-center text-data text-xs font-bold text-champagne-300">{value}</span>
       <button
         type="button"
         onClick={() => onChange(value + 1)}
         disabled={value >= max}
-        className="px-1 text-ink-400 transition-colors hover:text-champagne-300 disabled:opacity-30"
+        className="px-1 text-slate-300 transition-colors hover:text-champagne-300 disabled:opacity-30"
         aria-label={`Increase ${label}`}
       >
         +
@@ -94,7 +94,7 @@ export function ChatComposer() {
               ? 'Index a PDF first, then ask anything about it…'
               : 'Ask anything about your indexed documents…'
           }
-          className="max-h-44 min-h-[3.5rem] flex-1 resize-none bg-transparent px-2 py-2 text-base text-ink-100 placeholder:text-ink-500 focus:outline-none sm:min-h-[2.5rem]"
+          className="max-h-44 min-h-[3.5rem] flex-1 resize-none bg-transparent px-2.5 py-2 text-base font-medium text-slate-100 placeholder:text-slate-400 focus:outline-none sm:min-h-[2.5rem]"
         />
 
         <button
@@ -137,7 +137,7 @@ export function ChatComposer() {
           />
         </div>
 
-        <p className="text-data text-xs text-ink-500">
+        <p className="text-data text-xs text-slate-400">
           {value.length > 0 && `${value.length}/${MAX_QUESTION_LENGTH} · `}
           Enter to send · Shift+Enter for a new line
         </p>

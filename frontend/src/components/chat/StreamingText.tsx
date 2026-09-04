@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import { renderFormattedContent } from '@/lib/formatMarkdown';
 
-const CHARS_PER_TICK = 3;
-const TICK_MS = 12;
+const CHARS_PER_TICK = 4;
+const TICK_MS = 10;
 
 /**
  * The API returns a complete answer, so the "streaming" effect is a client-side
- * reveal. It resolves instantly for replayed history and for reduced-motion users.
+ * reveal. When typing finishes, it seamlessly renders full rich formatting.
  */
 export function StreamingText({
   text,
@@ -45,12 +46,16 @@ export function StreamingText({
 
   const isTyping = visibleCount < text.length;
 
+  if (!isTyping) {
+    return <div className="text-[15.5px] leading-relaxed text-slate-100 sm:text-base">{renderFormattedContent(text)}</div>;
+  }
+
   return (
-    <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-ink-100 sm:text-base">
-      {text.slice(0, visibleCount)}
-      {isTyping && (
+    <div className="text-[15.5px] leading-relaxed text-slate-100 sm:text-base">
+      <p className="whitespace-pre-wrap">
+        {text.slice(0, visibleCount)}
         <span className="ml-0.5 inline-block h-[1.05em] w-[2px] translate-y-[2px] animate-pulse bg-champagne-400 align-middle" />
-      )}
-    </p>
+      </p>
+    </div>
   );
 }

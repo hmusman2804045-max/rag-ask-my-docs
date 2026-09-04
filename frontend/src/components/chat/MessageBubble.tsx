@@ -86,16 +86,16 @@ export function MessageBubble({
       <div className={cn('min-w-0 max-w-[min(42rem,85%)]', isUser && 'flex flex-col items-end')}>
         <div
           className={cn(
-            'rounded-2xl border px-4 py-3 backdrop-blur-xl',
+            'rounded-2xl border px-4 py-3.5 backdrop-blur-xl',
             isUser
-              ? 'rounded-tr-sm border-gold-400/25 bg-gold-500/[0.12]'
+              ? 'rounded-tr-sm border-gold-400/35 bg-gold-500/[0.16] shadow-[0_4px_20px_-4px_rgba(245,158,11,0.2)]'
               : message.error
-                ? 'rounded-tl-sm border-rose-500/25 bg-rose-500/[0.07]'
-                : 'rounded-tl-sm border-white/10 bg-titanium-800/75',
+                ? 'rounded-tl-sm border-rose-500/30 bg-rose-500/[0.09]'
+                : 'rounded-tl-sm border-white/12 bg-titanium-800/90 shadow-glass',
           )}
         >
           {isUser ? (
-            <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-ink-100 sm:text-base">
+            <p className="whitespace-pre-wrap text-[15px] font-medium leading-relaxed text-amber-50 sm:text-base">
               {message.content}
             </p>
           ) : (
