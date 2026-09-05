@@ -9,7 +9,7 @@ def prompt_builder():
 
 def test_prompt_builder_default_system_prompt(prompt_builder):
     assert "AskMyDocs AI" in prompt_builder.system_prompt
-    assert "ONLY the provided document context" in prompt_builder.system_prompt
+    assert "ground your answers strictly and accurately" in prompt_builder.system_prompt
 
 
 def test_prompt_builder_build_context_block(prompt_builder):

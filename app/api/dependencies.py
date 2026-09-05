@@ -26,9 +26,14 @@ _rag_pipeline: Optional[RAGPipeline] = None
 def get_vector_store() -> VectorStore:
     global _vector_store
     if _vector_store is None:
-        persist_dir = os.getenv("CHROMA_PERSIST_DIR", "data/chroma_db")
-        collection_name = os.getenv("CHROMA_COLLECTION_NAME", "askmydocs_documents")
-        _vector_store = VectorStore(persist_dir=persist_dir, collection_name=collection_name)
+        mongo_uri = os.getenv("MONGODB_URI", "")
+        db_name = os.getenv("MONGODB_DB_NAME", "askmydocs")
+        collection_name = os.getenv("VECTOR_COLLECTION_NAME", "document_chunks")
+        _vector_store = VectorStore(
+            mongo_uri=mongo_uri,
+            db_name=db_name,
+            collection_name=collection_name
+        )
     return _vector_store
 
 

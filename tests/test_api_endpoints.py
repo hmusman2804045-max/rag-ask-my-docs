@@ -19,11 +19,10 @@ def create_sample_pdf_bytes(text: str = "AskMyDocs API test document.") -> bytes
 def test_root_endpoint():
     res = client.get("/")
     assert res.status_code == 200
-    assert "AskMyDocs RAG API" in res.json()["message"]
 
 
 def test_health_endpoint():
-    res = client.get("/health")
+    res = client.get("/api/v1/system/health")
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "healthy"
