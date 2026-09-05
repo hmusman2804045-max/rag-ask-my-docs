@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse, HTMLResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
@@ -63,18 +63,21 @@ if frontend_dist.exists() and (frontend_dist / "index.html").exists():
     if assets_dir.exists():
         app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="static-assets")
 
-    @app.get("/", include_in_schema=False)
+    @app.get("/", include_in_schema=False, response_class=HTMLResponse)
     async def serve_root():
-        return FileResponse(frontend_dist / "index.html")
+        index_file = frontend_dist / "index.html"
+        return HTMLResponse(content=index_file.read_text(encoding="utf-8"))
 
     @app.exception_handler(404)
     async def spa_404_handler(request: Request, exc):
         # Only fallback to index.html for non-API web routes
-        if not request.url.path.startswith("/api/"):
+        if not request.url.path.startswith("/api/") and not request.url.path.startswith("/docs") and not request.url.path.startswith("/openapi.json"):
             file_path = frontend_dist / request.url.path.lstrip("/")
             if file_path.exists() and file_path.is_file():
                 return FileResponse(file_path)
-            return FileResponse(frontend_dist / "index.html")
+            index_file = frontend_dist / "index.html"
+            if index_file.exists():
+                return HTMLResponse(content=index_file.read_text(encoding="utf-8"))
         return JSONResponse(status_code=404, content={"detail": "Not Found"})
 else:
     @app.get("/", include_in_schema=False)
