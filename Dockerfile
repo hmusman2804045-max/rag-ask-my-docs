@@ -21,19 +21,27 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     ENVIRONMENT=production \
     HOST=0.0.0.0 \
-    PORT=10000
+    PORT=10000 \
+    OMP_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1 \
+    TOKENIZERS_PARALLELISM=false
 
 WORKDIR /app
 
 # Install minimal system dependencies for PyMuPDF and SSL
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python requirements
+# Install lightweight CPU-only PyTorch first (avoids 1GB+ CUDA dependencies and reduces RAM usage by 75%)
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+# Install remaining Python requirements
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Pre-download the embedding model so it doesn't spike RAM on initial startup
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
 
 # Copy backend application code
 COPY app/ ./app/

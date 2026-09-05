@@ -50,6 +50,8 @@ class EmbeddingEngine:
 
     def _get_model(self) -> SentenceTransformer:
         if self._model is None:
+            import torch
+            torch.set_num_threads(1)
             self._model = SentenceTransformer(self.model_name)
         return self._model
 
