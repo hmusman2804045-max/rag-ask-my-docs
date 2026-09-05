@@ -92,16 +92,16 @@ class VectorStore:
 
         if self.is_connected and self._collection is not None:
             try:
-                # Upsert records using chunk_id as key
-                for rec in records:
-                    self._collection.replace_one(
-                        {"chunk_id": rec["chunk_id"]},
-                        rec,
-                        upsert=True
-                    )
+                # Upsert records in a single bulk operation
+                operations = [
+                    pymongo.ReplaceOne({"chunk_id": rec["chunk_id"]}, rec, upsert=True)
+                    for rec in records
+                ]
+                self._collection.bulk_write(operations, ordered=False)
+                logger.info(f"Upserted {len(records)} chunks into MongoDB VectorStore.")
                 return len(records)
             except PyMongoError as err:
-                logger.error(f"Failed to insert chunks to MongoDB: {err}. Writing to in-memory fallback.")
+                logger.error(f"Failed to upsert chunks into MongoDB VectorStore: {err}")
                 for rec in records:
                     self._fallback_chunks[rec["chunk_id"]] = rec
                 return len(records)

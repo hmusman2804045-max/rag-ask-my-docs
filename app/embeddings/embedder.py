@@ -61,7 +61,9 @@ class EmbeddingEngine:
             return [0.0] * 384
 
         model = self._get_model()
-        vector = model.encode(text, convert_to_numpy=True)
+        import torch
+        with torch.no_grad():
+            vector = model.encode(text, convert_to_numpy=True, show_progress_bar=False)
         return vector.tolist()
 
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
@@ -70,7 +72,9 @@ class EmbeddingEngine:
 
         cleaned_texts = [t.strip() for t in texts]
         model = self._get_model()
-        vectors = model.encode(cleaned_texts, convert_to_numpy=True)
+        import torch
+        with torch.no_grad():
+            vectors = model.encode(cleaned_texts, batch_size=8, convert_to_numpy=True, show_progress_bar=False)
         return vectors.tolist()
 
     def embed_chunks(self, chunks: List[ChunkData]) -> List[EmbeddedChunk]:
