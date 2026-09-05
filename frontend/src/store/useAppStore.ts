@@ -94,7 +94,7 @@ export const useAppStore = create<AppState>((set, get) => {
   const sessions = persistedSessions.length > 0 ? persistedSessions : [newSession(0)];
   const persistedActive = storage.getActiveSessionId();
   const activeSessionId =
-    persistedActive && sessions.some((session) => session.id === persistedActive)
+    persistedActive && sessions.some((session: SessionSummary) => session.id === persistedActive)
       ? persistedActive
       : sessions[0].id;
 
@@ -102,7 +102,7 @@ export const useAppStore = create<AppState>((set, get) => {
   storage.setActiveSessionId(activeSessionId);
 
   const touchSession = (sessionId: string, messageCount: number) => {
-    const updated = get().sessions.map((session) =>
+    const updated = get().sessions.map((session: SessionSummary) =>
       session.id === sessionId ? { ...session, updatedAt: Date.now(), messageCount } : session,
     );
     storage.setSessions(updated);
@@ -111,7 +111,7 @@ export const useAppStore = create<AppState>((set, get) => {
 
   /** Names a fresh session after its opening question so the history list stays scannable. */
   const titleSession = (sessionId: string, question: string) => {
-    const updated = get().sessions.map((session) => {
+    const updated = get().sessions.map((session: SessionSummary) => {
       if (session.id !== sessionId || !/^Session \d+$/.test(session.title)) return session;
       const title = question.length > 38 ? `${question.slice(0, 38).trim()}...` : question;
       return { ...session, title };
@@ -124,7 +124,7 @@ export const useAppStore = create<AppState>((set, get) => {
     const history = await api.getHistory(sessionId, get().userId);
     const cached = storage.getCitations(sessionId);
 
-    return history.messages.map((message, index) => {
+    return history.messages.map((message: { role: string; content: string; timestamp?: string }, index: number) => {
       const role = message.role === 'assistant' ? 'assistant' : 'user';
       return {
         id: `${sessionId}_${index}`,
@@ -225,7 +225,7 @@ export const useAppStore = create<AppState>((set, get) => {
       });
 
       try {
-        const result = await api.uploadDocument(file, (progress) => {
+        const result = await api.uploadDocument(file, (progress: number) => {
           set((state) => ({
             upload: {
               ...state.upload,
