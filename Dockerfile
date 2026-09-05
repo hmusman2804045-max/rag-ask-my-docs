@@ -21,7 +21,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     ENVIRONMENT=production \
     HOST=0.0.0.0 \
-    PORT=8000
+    PORT=10000
 
 WORKDIR /app
 
@@ -46,11 +46,11 @@ COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
-EXPOSE 8000
+EXPOSE 10000
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8000}/api/v1/system/health || exit 1
+    CMD curl -f http://localhost:${PORT:-10000}/api/v1/system/health || exit 1
 
 # Start FastAPI server
 CMD ["python", "scripts/run_api_server.py"]
