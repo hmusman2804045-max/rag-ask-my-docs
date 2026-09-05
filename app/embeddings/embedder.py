@@ -1,7 +1,18 @@
 from dataclasses import dataclass, field
 from typing import List, Union
 import numpy as np
-from sentence_transformers import SentenceTransformer
+
+try:
+    from fastembed import TextEmbedding
+    FASTEMBED_AVAILABLE = True
+except ImportError:
+    FASTEMBED_AVAILABLE = False
+
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
 
 from app.chunking.text_chunker import ChunkData, ChunkingPayload
 
@@ -46,21 +57,36 @@ class EmbeddingEngine:
 
     def __init__(self, model_name: str = DEFAULT_MODEL):
         self.model_name = model_name
-        self._model = None
+        self._fastembed_model = None
+        self._st_model = None
 
-    def _get_model(self) -> SentenceTransformer:
-        if self._model is None:
+    def _get_fastembed(self):
+        if self._fastembed_model is None and FASTEMBED_AVAILABLE:
+            try:
+                self._fastembed_model = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
+            except Exception:
+                self._fastembed_model = None
+        return self._fastembed_model
+
+    def _get_st_model(self):
+        if self._st_model is None:
+            from sentence_transformers import SentenceTransformer
             import torch
             torch.set_num_threads(1)
-            self._model = SentenceTransformer(self.model_name)
-        return self._model
+            self._st_model = SentenceTransformer(self.model_name)
+        return self._st_model
 
     def embed_text(self, text: str) -> List[float]:
         text = text.strip() if text else ""
         if not text:
             return [0.0] * 384
 
-        model = self._get_model()
+        fe = self._get_fastembed()
+        if fe is not None:
+            embeddings = list(fe.embed([text]))
+            return embeddings[0].tolist()
+
+        model = self._get_st_model()
         import torch
         with torch.no_grad():
             vector = model.encode(text, convert_to_numpy=True, show_progress_bar=False)
@@ -71,7 +97,12 @@ class EmbeddingEngine:
             return []
 
         cleaned_texts = [t.strip() for t in texts]
-        model = self._get_model()
+        fe = self._get_fastembed()
+        if fe is not None:
+            embeddings = list(fe.embed(cleaned_texts, batch_size=16))
+            return [e.tolist() for e in embeddings]
+
+        model = self._get_st_model()
         import torch
         with torch.no_grad():
             vectors = model.encode(cleaned_texts, batch_size=8, convert_to_numpy=True, show_progress_bar=False)
