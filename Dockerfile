@@ -33,15 +33,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install lightweight CPU-only PyTorch first (avoids 1GB+ CUDA dependencies and reduces RAM usage by 75%)
-RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
-
-# Install remaining Python requirements
+# Install lightweight Python requirements (ONNX-powered FastEmbed - uses <60MB RAM)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download the embedding model so it doesn't spike RAM on initial startup
-RUN python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2')"
+# Pre-download and cache FastEmbed model in the image
+RUN python -c "from fastembed import TextEmbedding; list(TextEmbedding(model_name='sentence-transformers/all-MiniLM-L6-v2').embed(['init']))"
 
 # Copy backend application code
 COPY app/ ./app/

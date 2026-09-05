@@ -53,43 +53,34 @@ def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
 
 
 class EmbeddingEngine:
-    DEFAULT_MODEL = "all-MiniLM-L6-v2"
+    DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
     def __init__(self, model_name: str = DEFAULT_MODEL):
         self.model_name = model_name
-        self._fastembed_model = None
-        self._st_model = None
+        self._model = None
 
-    def _get_fastembed(self):
-        if self._fastembed_model is None and FASTEMBED_AVAILABLE:
-            try:
-                self._fastembed_model = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
-            except Exception:
-                self._fastembed_model = None
-        return self._fastembed_model
-
-    def _get_st_model(self):
-        if self._st_model is None:
-            from sentence_transformers import SentenceTransformer
-            import torch
-            torch.set_num_threads(1)
-            self._st_model = SentenceTransformer(self.model_name)
-        return self._st_model
+    def _get_model(self):
+        if self._model is None:
+            if FASTEMBED_AVAILABLE:
+                self._model = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
+            elif SENTENCE_TRANSFORMERS_AVAILABLE:
+                from sentence_transformers import SentenceTransformer
+                self._model = SentenceTransformer("all-MiniLM-L6-v2")
+            else:
+                raise RuntimeError("No embedding backend (fastembed or sentence-transformers) available.")
+        return self._model
 
     def embed_text(self, text: str) -> List[float]:
         text = text.strip() if text else ""
         if not text:
             return [0.0] * 384
 
-        fe = self._get_fastembed()
-        if fe is not None:
-            embeddings = list(fe.embed([text]))
+        model = self._get_model()
+        if FASTEMBED_AVAILABLE and isinstance(model, TextEmbedding):
+            embeddings = list(model.embed([text]))
             return embeddings[0].tolist()
 
-        model = self._get_st_model()
-        import torch
-        with torch.no_grad():
-            vector = model.encode(text, convert_to_numpy=True, show_progress_bar=False)
+        vector = model.encode(text, convert_to_numpy=True, show_progress_bar=False)
         return vector.tolist()
 
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
@@ -97,15 +88,12 @@ class EmbeddingEngine:
             return []
 
         cleaned_texts = [t.strip() for t in texts]
-        fe = self._get_fastembed()
-        if fe is not None:
-            embeddings = list(fe.embed(cleaned_texts, batch_size=16))
+        model = self._get_model()
+        if FASTEMBED_AVAILABLE and isinstance(model, TextEmbedding):
+            embeddings = list(model.embed(cleaned_texts, batch_size=16))
             return [e.tolist() for e in embeddings]
 
-        model = self._get_st_model()
-        import torch
-        with torch.no_grad():
-            vectors = model.encode(cleaned_texts, batch_size=8, convert_to_numpy=True, show_progress_bar=False)
+        vectors = model.encode(cleaned_texts, batch_size=8, convert_to_numpy=True, show_progress_bar=False)
         return vectors.tolist()
 
     def embed_chunks(self, chunks: List[ChunkData]) -> List[EmbeddedChunk]:
