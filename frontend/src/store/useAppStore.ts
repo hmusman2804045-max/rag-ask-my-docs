@@ -86,6 +86,12 @@ interface AppState {
   pushToast: (toast: Omit<Toast, 'id'>) => void;
   dismissToast: (id: string) => void;
 
+  activeTab: 'home' | 'documents' | 'history' | 'settings';
+  setActiveTab: (tab: 'home' | 'documents' | 'history' | 'settings') => void;
+
+  isUploadModalOpen: boolean;
+  setUploadModalOpen: (open: boolean) => void;
+
   bootstrap: () => Promise<void>;
 }
 
@@ -444,6 +450,16 @@ export const useAppStore = create<AppState>((set, get) => {
     },
     dismissToast(id) {
       set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) }));
+    },
+
+    activeTab: 'home',
+    setActiveTab(tab) {
+      set({ activeTab: tab });
+    },
+
+    isUploadModalOpen: false,
+    setUploadModalOpen(open) {
+      set({ isUploadModalOpen: open });
     },
 
     async bootstrap() {

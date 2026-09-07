@@ -6,8 +6,8 @@ import { useAppStore } from '@/store/useAppStore';
 
 const SUGGESTIONS = [
   'Summarise the key findings of this document.',
-  'What are the stated limitations or risks?',
-  'List every requirement mentioned, with page numbers.',
+  'What are the stated limitations or methodology?',
+  'List every key metric or requirement mentioned.',
 ];
 
 function EmptyState() {
@@ -20,27 +20,27 @@ function EmptyState() {
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col items-center justify-center px-6 py-6 text-center"
     >
-      <div className="grid h-12 w-12 place-items-center rounded-2xl border border-champagne-500/25 bg-gradient-to-br from-gold-600/30 to-gold-800/30">
-        <Sparkles className="h-5 w-5 text-champagne-400" />
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-400 shadow-md shadow-amber-500/20">
+        <Sparkles className="h-6 w-6" />
       </div>
 
-      <h2 className="mt-4 font-display text-lg font-semibold text-ink-100 sm:text-xl">
-        {documents.length === 0 ? 'The codex is empty' : 'Ask the codex'}
+      <h2 className="mt-4 font-display text-base font-bold text-ink-100 sm:text-lg">
+        {documents.length === 0 ? 'Document Intelligence Engine' : 'Ask Your Knowledge Base'}
       </h2>
-      <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-400 sm:text-base">
+      <p className="mt-2 max-w-md text-xs leading-relaxed text-ink-400 sm:text-sm">
         {documents.length === 0
-          ? 'Drop a PDF into the ingestion panel. It will be extracted, chunked, embedded and indexed into the vector store.'
-          : 'Every answer is grounded in retrieved chunks. Click any citation to inspect the exact source text.'}
+          ? 'Upload a PDF to extract text, generate 384d FastEmbed vectors, and start conversational retrieval.'
+          : 'Answers are synthesized strictly from retrieved context chunks with traceable citations.'}
       </p>
 
       {documents.length > 0 && (
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
           {SUGGESTIONS.map((suggestion) => (
             <button
               key={suggestion}
               type="button"
               onClick={() => void askQuestion(suggestion)}
-              className="rounded-xl border border-white/8 bg-white/[0.02] px-3.5 py-2 text-xs font-medium text-ink-300 transition-all hover:border-gold-400/40 hover:bg-gold-500/10 hover:text-ink-100 sm:text-sm"
+              className="rounded-xl border border-white/5 bg-charcoal-800/80 px-3.5 py-1.5 text-xs text-ink-300 transition-all hover:border-amber-500/40 hover:bg-charcoal-750 hover:text-amber-300"
             >
               {suggestion}
             </button>
@@ -61,16 +61,18 @@ function RetrievalIndicator() {
       exit={{ opacity: 0, y: -6 }}
       className="flex items-center gap-3"
     >
-      <div className="relative mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-xl border border-champagne-500/30 bg-gradient-to-br from-gold-600/40 to-gold-800/40">
-        <span className="absolute inset-0 animate-pulse-ring rounded-xl border border-champagne-500/40" />
-        <Radar className="h-3.5 w-3.5 animate-pulse text-champagne-400" />
+      <div className="relative mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-400">
+        <span className="absolute inset-0 animate-ping rounded-xl border border-amber-500/40 opacity-40" />
+        <Radar className="h-4 w-4 animate-spin text-amber-400" />
       </div>
 
-      <div className="rounded-2xl rounded-tl-sm border border-white/10 bg-titanium-700/65 px-4 py-3 backdrop-blur-xl">
-        <p className="text-sm text-ink-300 sm:text-base">
-          Detangling {nChunks} chunk{nChunks === 1 ? '' : 's'} from the vector index…
+      <div className="rounded-2xl rounded-tl-sm border border-white/10 bg-charcoal-850/90 px-4 py-3 backdrop-blur-xl">
+        <p className="text-xs text-ink-200 sm:text-sm font-medium">
+          Retrieving top {nChunks} semantic chunk{nChunks === 1 ? '' : 's'} via MongoDB Atlas Vector Search…
         </p>
-        <div className="mt-2 h-px w-48 shimmer-line" />
+        <div className="mt-2 h-0.5 w-44 overflow-hidden rounded-full bg-charcoal-800">
+          <div className="h-full w-full bg-gradient-to-r from-transparent via-amber-400 to-transparent animate-[shimmer_1.5s_infinite]" />
+        </div>
       </div>
     </motion.div>
   );
@@ -89,7 +91,6 @@ export function ChatFeed() {
     }
   }, []);
 
-  // Only auto-scroll while the reader is already at the bottom of the feed.
   const onScroll = () => {
     const el = scrollRef.current;
     if (!el) return;
@@ -112,7 +113,7 @@ export function ChatFeed() {
     <div
       ref={scrollRef}
       onScroll={onScroll}
-      className="scrollbar-thin min-h-0 flex-1 space-y-5 overflow-y-auto px-1 py-2"
+      className="scrollbar-thin min-h-0 flex-1 space-y-4 overflow-y-auto px-2 py-2"
     >
       {messages.map((message) => (
         <MessageBubble key={message.id} message={message} onStream={scrollToBottom} />

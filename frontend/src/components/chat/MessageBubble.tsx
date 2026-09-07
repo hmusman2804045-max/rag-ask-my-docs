@@ -30,17 +30,17 @@ function CitationTag({
       className={cn(
         'group inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-data text-xs transition-all duration-200',
         isActive
-          ? 'border-champagne-300/60 bg-champagne-300/15 text-champagne-200 shadow-gold'
-          : 'border-gold-500/30 bg-gold-500/[0.1] text-champagne-300 shadow-[0_0_18px_-8px_rgba(245,158,11,0.7)] hover:border-gold-400/60 hover:bg-gold-500/[0.16] hover:text-champagne-200',
+          ? 'border-amber-400 bg-amber-500/20 text-amber-200 shadow-md shadow-amber-500/20'
+          : 'border-amber-500/30 bg-amber-500/10 text-amber-300 hover:border-amber-400/60 hover:bg-amber-500/20 hover:text-amber-200',
       )}
       title={`Inspect chunk ${citation.chunk_id}`}
     >
       <Quote className="h-2.5 w-2.5 opacity-70" />
       <span>{formatPages(citation.page_numbers)}</span>
-      <span className="text-gold-500/60">|</span>
+      <span className="text-amber-500/50">|</span>
       <span className="max-w-[9rem] truncate">{truncateMiddle(citation.doc_name, 18)}</span>
-      <span className="text-gold-500/60">|</span>
-      <span className={cn(citation.similarity_score >= 0.7 && 'text-champagne-200')}>
+      <span className="text-amber-500/50">|</span>
+      <span className={cn(citation.similarity_score >= 0.7 && 'text-amber-200 font-semibold')}>
         {formatPercent(citation.similarity_score)} match
       </span>
     </motion.button>
@@ -68,18 +68,18 @@ export function MessageBubble({
         className={cn(
           'mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-xl border',
           isUser
-            ? 'border-white/10 bg-white/[0.04]'
+            ? 'border-white/10 bg-charcoal-800 text-ink-300'
             : message.error
-              ? 'border-rose-500/30 bg-rose-500/10'
-              : 'border-champagne-500/30 bg-gradient-to-br from-gold-600/40 to-gold-800/40',
+              ? 'border-red-500/30 bg-red-500/10 text-red-400'
+              : 'border-amber-500/30 bg-amber-500/15 text-amber-400',
         )}
       >
         {isUser ? (
-          <User className="h-3.5 w-3.5 text-ink-400" />
+          <User className="h-4 w-4" />
         ) : message.error ? (
-          <AlertTriangle className="h-3.5 w-3.5 text-rose-300" />
+          <AlertTriangle className="h-4 w-4" />
         ) : (
-          <Sparkles className="h-3.5 w-3.5 text-champagne-400" />
+          <Sparkles className="h-4 w-4" />
         )}
       </div>
 
@@ -88,14 +88,14 @@ export function MessageBubble({
           className={cn(
             'rounded-2xl border px-4 py-3.5 backdrop-blur-xl',
             isUser
-              ? 'rounded-tr-sm border-gold-400/35 bg-gold-500/[0.16] shadow-[0_4px_20px_-4px_rgba(245,158,11,0.2)]'
+              ? 'rounded-tr-sm border-amber-500/30 bg-amber-500/10 text-ink-100 shadow-md shadow-amber-500/5'
               : message.error
-                ? 'rounded-tl-sm border-rose-500/30 bg-rose-500/[0.09]'
-                : 'rounded-tl-sm border-white/12 bg-titanium-800/90 shadow-glass',
+                ? 'rounded-tl-sm border-red-500/30 bg-red-500/10 text-red-200'
+                : 'rounded-tl-sm border-white/10 bg-charcoal-850/90 text-ink-100 shadow-md shadow-black/40',
           )}
         >
           {isUser ? (
-            <p className="whitespace-pre-wrap text-[15px] font-medium leading-relaxed text-amber-50 sm:text-base">
+            <p className="whitespace-pre-wrap text-[14px] font-normal leading-relaxed text-ink-100">
               {message.content}
             </p>
           ) : (
@@ -121,7 +121,7 @@ export function MessageBubble({
         )}
 
         {!isUser && message.model && (
-          <p className="mt-2 text-data text-xs text-ink-500">
+          <p className="mt-2 font-mono text-[11px] text-ink-500">
             {message.model}
             {message.isMock && ' · mock mode'}
             {message.usage?.total_tokens ? ` · ${message.usage.total_tokens} tokens` : ''}

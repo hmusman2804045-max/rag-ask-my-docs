@@ -14,115 +14,105 @@
   }
 
   body {
-    background-color: #08090D;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    color: #F8FAFC;
-    font-size: 15px;
-    line-height: 1.6;
+    background-color: #080A0D;
+    font-family: 'Inter', 'Geist', system-ui, -apple-system, sans-serif;
+    color: #F5F7FA;
+    font-size: 14px;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Warm titanium ambience — amber at the horizon, never a flat black field. */
     background-image:
-      radial-gradient(ellipse 120% 85% at 50% -18%, rgba(217, 119, 6, 0.3), transparent 62%),
-      radial-gradient(900px 620px at 88% 4%, rgba(245, 158, 11, 0.13), transparent 62%),
-      radial-gradient(1000px 700px at 8% 96%, rgba(180, 83, 9, 0.12), transparent 65%),
-      linear-gradient(180deg, #0D101A 0%, #08090D 55%, #05060A 100%);
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(245, 166, 35, 0.08), transparent 60%),
+      radial-gradient(700px 500px at 90% 90%, rgba(217, 154, 37, 0.04), transparent 65%),
+      linear-gradient(180deg, #080A0D 0%, #0B0E13 100%);
     background-attachment: fixed;
   }
 
-  h1,
-  h2,
-  h3 {
-    font-family: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
-  }
-
   ::selection {
-    background: rgba(245, 158, 11, 0.35);
+    background: rgba(245, 166, 35, 0.28);
     color: #ffffff;
   }
 
   *:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px #08090D, 0 0 0 4px rgba(245, 158, 11, 0.7);
+    box-shadow: 0 0 0 2px #080A0D, 0 0 0 4px rgba(245, 166, 35, 0.6);
   }
 }
 
 @layer components {
-  /* Frosted titanium glass with a hairline gold edge. */
-  .glass {
-    background: rgba(17, 20, 31, 0.78);
-    border: 1px solid rgba(245, 158, 11, 0.22);
-    box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+  /* Premium Dark SaaS Glass Cards */
+  .card-premium {
+    background: rgba(17, 21, 28, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
-  .glass-subtle {
-    background: rgba(13, 16, 26, 0.65);
+  .card-interactive {
+    background: rgba(17, 21, 28, 0.65);
     border: 1px solid rgba(255, 255, 255, 0.07);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* Faint engineering grid the 3D canvas sits inside. */
-  .grid-glow {
+  .card-interactive:hover {
+    background: rgba(21, 26, 34, 0.85);
+    border-color: rgba(245, 166, 35, 0.3);
+    box-shadow: 0 0 20px -4px rgba(245, 166, 35, 0.15);
+  }
+
+  /* Amber Button Glowing Effect */
+  .btn-amber-primary {
+    background: linear-gradient(135deg, #FFB52E 0%, #F5A623 50%, #D99A25 100%);
+    color: #080A0D;
+    font-weight: 600;
+    box-shadow: 0 0 20px -2px rgba(245, 166, 35, 0.35);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .btn-amber-primary:hover {
+    box-shadow: 0 0 28px 0px rgba(245, 166, 35, 0.5);
+    transform: translateY(-1px) scale(1.01);
+  }
+
+  .btn-amber-primary:active {
+    transform: translateY(0px) scale(0.99);
+  }
+
+  /* Subtle engineering grid for 3D backdrop */
+  .grid-subtle {
     background-image:
-      linear-gradient(rgba(245, 158, 11, 0.07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(245, 158, 11, 0.07) 1px, transparent 1px);
-    background-size: 46px 46px;
-    mask-image: radial-gradient(ellipse 70% 70% at 50% 45%, #000 25%, transparent 78%);
-    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 45%, #000 25%, transparent 78%);
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 20%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 20%, transparent 80%);
   }
 
-  .gold-divider {
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(245, 158, 11, 0.5),
-      rgba(253, 230, 138, 0.4),
-      transparent
-    );
-  }
-
-  .text-gradient-gold {
-    background: linear-gradient(110deg, #fde68a 0%, #f59e0b 45%, #d97706 100%);
+  .text-gradient-amber {
+    background: linear-gradient(110deg, #FFF0CC 0%, #FFB52E 40%, #F5A623 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
-  .shimmer-line {
-    background: linear-gradient(
-      90deg,
-      rgba(245, 158, 11, 0) 0%,
-      rgba(245, 158, 11, 0.85) 45%,
-      rgba(253, 230, 138, 0.9) 55%,
-      rgba(245, 158, 11, 0) 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2.4s linear infinite;
-  }
-
-  /*
-   * Numeric and identifier readouts. Inter with tabular figures keeps columns
-   * aligned without dropping into a retro monospace face.
-   */
   .text-data {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', 'Geist', system-ui, sans-serif;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.02em;
   }
 }
 
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: rgba(245, 158, 11, 0.4) transparent;
+    scrollbar-color: rgba(245, 166, 35, 0.25) transparent;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {
@@ -130,12 +120,12 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: rgba(245, 158, 11, 0.35);
+    background-color: rgba(255, 255, 255, 0.12);
     border-radius: 9999px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(253, 230, 138, 0.5);
+    background-color: rgba(245, 166, 35, 0.4);
   }
 }
 

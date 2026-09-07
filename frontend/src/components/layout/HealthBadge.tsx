@@ -17,15 +17,15 @@ function StatusDot({ tone }: { tone: Tone }) {
   return (
     <span className="relative flex h-1.5 w-1.5 shrink-0">
       {tone === 'ok' && (
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success/70" />
       )}
       <span
         className={cn(
           'relative inline-flex h-1.5 w-1.5 rounded-full',
-          tone === 'ok' && 'bg-emerald-400',
-          tone === 'warn' && 'bg-gold-400',
-          tone === 'down' && 'bg-rose-400',
-          tone === 'pending' && 'bg-ink-500',
+          tone === 'ok' && 'bg-success',
+          tone === 'warn' && 'bg-amber-primary',
+          tone === 'down' && 'bg-rose-500',
+          tone === 'pending' && 'bg-ink-muted',
         )}
       />
     </span>
@@ -36,26 +36,16 @@ function Pill({ label, value, tone }: { label: string; value: string; tone: Tone
   return (
     <span
       className={cn(
-        'flex items-center gap-1.5 rounded-full border px-2.5 py-1',
-        tone === 'ok' && 'border-emerald-400/25 bg-emerald-400/[0.07]',
-        tone === 'warn' && 'border-gold-400/30 bg-gold-500/[0.08]',
-        tone === 'down' && 'border-rose-400/30 bg-rose-500/[0.08]',
-        tone === 'pending' && 'border-white/10 bg-white/[0.03]',
+        'flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs',
+        tone === 'ok' && 'border-success/30 bg-success/10 text-success',
+        tone === 'warn' && 'border-amber-primary/30 bg-amber-primary/10 text-amber-primary',
+        tone === 'down' && 'border-rose-500/30 bg-rose-500/10 text-rose-400',
+        tone === 'pending' && 'border-white/10 bg-white/[0.02] text-ink-muted',
       )}
     >
       <StatusDot tone={tone} />
-      <span className="text-[10px] uppercase tracking-wider text-ink-500">{label}</span>
-      <span
-        className={cn(
-          'text-data text-[11px] font-medium',
-          tone === 'ok' && 'text-emerald-300',
-          tone === 'warn' && 'text-champagne-300',
-          tone === 'down' && 'text-rose-300',
-          tone === 'pending' && 'text-ink-400',
-        )}
-      >
-        {value}
-      </span>
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-ink-muted">{label}</span>
+      <span className="text-data font-medium">{value}</span>
     </span>
   );
 }
@@ -108,7 +98,7 @@ export function HealthBadge() {
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           aria-label="System health details"
-          className="glass hidden items-center gap-1.5 rounded-full px-2 py-1.5 transition-colors hover:border-gold-400/45 md:flex"
+          className="hidden items-center gap-1.5 rounded-full border border-card-border bg-card/60 px-2 py-1 transition-colors hover:border-amber-primary/40 md:flex"
         >
           <Pill
             label="Mongo"
@@ -116,7 +106,7 @@ export function HealthBadge() {
             tone={mongoTone}
           />
           <Pill
-            label="Chroma"
+            label="Vector"
             value={vectorCount === null ? '—' : `${formatNumber(vectorCount)} vec`}
             tone={chromaTone}
           />
@@ -133,15 +123,15 @@ export function HealthBadge() {
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           className={cn(
-            'glass flex items-center gap-2 rounded-full px-3 py-2 text-xs transition-colors md:hidden',
-            online ? 'hover:border-gold-400/45' : 'border-rose-500/30',
+            'flex items-center gap-2 rounded-full border border-card-border bg-card/60 px-3 py-1.5 text-xs transition-colors md:hidden',
+            online ? 'hover:border-amber-primary/40' : 'border-rose-500/30',
           )}
         >
           <StatusDot tone={online ? 'ok' : isLoading ? 'pending' : 'down'} />
           <span
             className={cn(
               'text-data text-[10px] font-semibold uppercase tracking-wider',
-              liveMode ? 'text-champagne-300' : 'text-gold-300',
+              liveMode ? 'text-amber-bright' : 'text-amber-primary',
             )}
           >
             {online ? (liveMode ? 'Groq live' : 'Mock') : 'Offline'}
@@ -151,7 +141,7 @@ export function HealthBadge() {
         <button
           type="button"
           onClick={() => void fetchHealth()}
-          className="glass rounded-full p-2 text-ink-400 transition-colors hover:text-champagne-300"
+          className="rounded-full border border-card-border bg-card/60 p-2 text-ink-muted transition-colors hover:border-amber-primary/40 hover:text-amber-primary"
           aria-label="Refresh system health"
         >
           <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />
@@ -165,46 +155,44 @@ export function HealthBadge() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.97 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="glass absolute right-0 top-12 z-40 w-80 rounded-2xl p-4"
+            className="card-premium absolute right-0 top-12 z-40 w-80 rounded-2xl p-4 shadow-2xl"
           >
-            <div className="flex items-center justify-between">
-              <p className="font-display text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-500">
-                Service topology
+            <div className="flex items-center justify-between border-b border-card-border pb-2.5">
+              <p className="font-display text-[10px] font-bold uppercase tracking-[0.2em] text-amber-primary">
+                Service Topology
               </p>
-              <span className="text-data text-[10px] text-ink-500">{API_BASE_URL}</span>
+              <span className="text-data text-[10px] text-ink-muted">{API_BASE_URL || 'production root'}</span>
             </div>
 
-            <div className="my-3 h-px w-full gold-divider" />
-
             {health ? (
-              <div className="divide-y divide-white/5">
+              <div className="mt-2 divide-y divide-white/5">
                 <DetailRow
                   icon={Database}
                   label="MongoDB Atlas"
-                  value={health.mongodb_connected ? 'connected' : 'in-memory fallback'}
+                  value={health.mongodb_connected ? 'Connected' : 'In-memory fallback'}
                   ok={health.mongodb_connected}
                 />
                 <DetailRow
                   icon={HardDrive}
-                  label="Chroma vector store"
+                  label="Vector Index"
                   value={health.chroma_status}
                   ok={health.chroma_status.startsWith('healthy')}
                 />
                 <DetailRow
                   icon={Sparkles}
-                  label="Groq LLM"
+                  label="Groq LLaMA 3.3"
                   value={
                     health.is_mock_mode
-                      ? 'mock generation'
+                      ? 'Mock mode'
                       : health.groq_available
-                        ? 'live inference'
-                        : 'sdk missing'
+                        ? 'Connected (LPU)'
+                        : 'SDK unavailable'
                   }
                   ok={!health.is_mock_mode}
                 />
                 <DetailRow
                   icon={Activity}
-                  label="API status"
+                  label="FastAPI Status"
                   value={health.status}
                   ok={health.status === 'healthy'}
                 />

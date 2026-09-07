@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FileText, Loader2, Trash2 } from 'lucide-react';
+import { FileText, Loader2, Plus, Trash2, UploadCloud } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
-import { SectionLabel } from '@/components/ui/Primitives';
 import { cn, formatNumber, truncateMiddle } from '@/lib/utils';
 
-export function DocumentList() {
+export function DocumentList({ onOpenUpload }: { onOpenUpload?: () => void }) {
   const documents = useAppStore((state) => state.documents);
   const isLoading = useAppStore((state) => state.isDocumentsLoading);
   const deleteDocument = useAppStore((state) => state.deleteDocument);
@@ -18,28 +17,50 @@ export function DocumentList() {
   };
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col">
+    <section className="flex flex-col">
       <div className="flex items-center justify-between px-1">
-        <SectionLabel>Indexed repository</SectionLabel>
-        <span className="text-data text-xs text-ink-400">
-          {isLoading ? '···' : `${documents.length} docs`}
+        <span className="font-display text-[10px] font-bold uppercase tracking-[0.18em] text-ink-muted">
+          Recent Documents
         </span>
+        {documents.length > 0 && onOpenUpload && (
+          <button
+            type="button"
+            onClick={onOpenUpload}
+            className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-amber-primary transition-colors hover:bg-amber-500/10"
+          >
+            <Plus className="h-3 w-3" />
+            Upload
+          </button>
+        )}
       </div>
 
-      <div className="scrollbar-thin mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+      <div className="mt-2.5 space-y-1.5">
         {isLoading && documents.length === 0 && (
-          <div className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-ink-500">
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            Reading the vector index…
+          <div className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-ink-muted">
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-amber-primary" />
+            Loading knowledge base…
           </div>
         )}
 
         {!isLoading && documents.length === 0 && (
-          <div className="rounded-xl border border-dashed border-white/10 p-4 text-center">
-            <p className="text-sm text-ink-400">No documents indexed yet.</p>
-            <p className="mt-1 text-xs text-ink-500">
-              Upload a PDF to give the codex something to reason over.
+          <div className="rounded-xl border border-dashed border-card-border bg-card/40 p-4 text-center">
+            <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-lg border border-amber-primary/20 bg-amber-500/10 text-amber-primary">
+              <FileText className="h-4 w-4" />
+            </div>
+            <p className="mt-2 text-xs font-semibold text-ink-primary">No documents yet</p>
+            <p className="mt-1 text-[11px] leading-relaxed text-ink-muted">
+              Upload your first PDF to build your knowledge base.
             </p>
+            {onOpenUpload && (
+              <button
+                type="button"
+                onClick={onOpenUpload}
+                className="btn-amber-primary mt-3 inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Upload PDF</span>
+              </button>
+            )}
           </div>
         )}
 
@@ -48,28 +69,27 @@ export function DocumentList() {
             <motion.article
               key={doc.doc_name}
               layout
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, x: -12 }}
-              transition={{ duration: 0.22 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.18 }}
               className={cn(
-                'group rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-colors',
-                'hover:border-gold-400/30 hover:bg-gold-500/[0.06]',
+                'group relative rounded-xl border border-card-border bg-card/60 p-2.5 transition-all duration-200',
+                'hover:border-amber-primary/30 hover:bg-card-hover hover:shadow-card-subtle',
                 pending === doc.doc_name && 'opacity-50',
               )}
             >
               <div className="flex items-start gap-2.5">
-                <div className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-champagne-500/25 bg-champagne-500/10">
-                  <FileText className="h-3.5 w-3.5 text-champagne-400" />
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-amber-primary/25 bg-amber-500/10 text-amber-primary">
+                  <FileText className="h-3.5 w-3.5" />
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-semibold text-ink-100 sm:text-sm" title={doc.doc_name}>
-                    {truncateMiddle(doc.doc_name, 24)}
+                  <p className="truncate text-xs font-semibold text-ink-primary" title={doc.doc_name}>
+                    {truncateMiddle(doc.doc_name, 22)}
                   </p>
-                  <p className="mt-1 text-data text-xs text-ink-500">
-                    {doc.page_count} pages · {doc.chunk_count} chunks ·{' '}
-                    {formatNumber(doc.word_count)} words
+                  <p className="mt-0.5 text-data text-[11px] text-ink-muted">
+                    {doc.page_count} {doc.page_count === 1 ? 'page' : 'pages'} · {doc.chunk_count} chunks
                   </p>
                 </div>
 
@@ -77,11 +97,12 @@ export function DocumentList() {
                   type="button"
                   onClick={() => void handleDelete(doc.doc_name)}
                   disabled={pending === doc.doc_name}
-                  className="rounded-lg p-1.5 text-ink-500 opacity-0 transition-all hover:bg-rose-500/15 hover:text-rose-300 focus-visible:opacity-100 group-hover:opacity-100"
-                  aria-label={`Delete ${doc.doc_name} from the index`}
+                  className="rounded-lg p-1 text-ink-muted opacity-0 transition-all hover:bg-rose-500/15 hover:text-rose-400 focus-visible:opacity-100 group-hover:opacity-100"
+                  aria-label={`Delete ${doc.doc_name}`}
+                  title="Delete document"
                 >
                   {pending === doc.doc_name ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-rose-400" />
                   ) : (
                     <Trash2 className="h-3.5 w-3.5" />
                   )}

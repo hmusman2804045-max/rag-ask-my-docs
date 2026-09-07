@@ -1,4 +1,4 @@
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { ChevronDown, Database, FileText, Layers, MessagesSquare, PanelLeft, Sparkles, User } from 'lucide-react';
 import { HealthBadge } from './HealthBadge';
 import { useAppStore } from '@/store/useAppStore';
 import { formatNumber } from '@/lib/utils';
@@ -11,60 +11,92 @@ export function TopBar({
   onToggleSidebar: () => void;
 }) {
   const documents = useAppStore((state) => state.documents);
+  const sessions = useAppStore((state) => state.sessions);
   const userId = useAppStore((state) => state.userId);
 
   const totalChunks = documents.reduce((sum, doc) => sum + doc.chunk_count, 0);
 
   return (
-    <header className="relative z-30 flex items-center justify-between gap-3 px-5 py-4">
-      <div className="flex min-w-0 items-center gap-4">
+    <header className="relative z-30 flex h-16 shrink-0 items-center justify-between border-b border-card-border bg-bg-secondary/80 px-4 backdrop-blur-xl sm:px-6">
+      {/* Left: Brand & Title */}
+      <div className="flex min-w-0 items-center gap-3.5">
         <button
           type="button"
           onClick={onToggleSidebar}
-          className="glass rounded-xl p-2.5 text-ink-400 transition-colors hover:text-champagne-300 lg:hidden"
-          aria-label={sidebarOpen ? 'Hide document panel' : 'Show document panel'}
+          className="rounded-lg border border-card-border bg-card p-2 text-ink-secondary transition-colors hover:border-amber-primary/40 hover:text-amber-primary lg:hidden"
+          aria-label={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
         >
-          {sidebarOpen ? (
-            <PanelLeftClose className="h-4 w-4" />
-          ) : (
-            <PanelLeftOpen className="h-4 w-4" />
-          )}
+          <PanelLeft className="h-4 w-4" />
         </button>
 
-        <div className="flex min-w-0 items-center gap-3">
-          {/* Glowing amber indicator: the system is live. */}
-          <span className="relative grid h-9 w-9 shrink-0 place-items-center">
-            <span className="absolute inset-0 rounded-xl border border-gold-500/35 bg-gradient-to-br from-gold-500/25 to-gold-700/20" />
-            <span className="relative h-2 w-2 animate-glow-dot rounded-full bg-gold-400" />
-          </span>
+        <div className="flex items-center gap-3">
+          {/* Geometric Gold Logo */}
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-amber-primary/40 bg-gradient-to-br from-amber-500/20 via-card to-bg-primary shadow-amber-glow">
+            <div className="absolute inset-0 rounded-xl bg-amber-primary/5" />
+            <Sparkles className="h-4 w-4 text-amber-primary" />
+          </div>
 
           <div className="min-w-0">
-            <h1 className="truncate font-display text-base font-bold uppercase tracking-wider text-ink-100 sm:text-lg">
-              AskMyDocs <span className="text-gradient-gold">AI</span>
-            </h1>
-            <p className="hidden text-xs uppercase tracking-[0.2em] text-ink-400 sm:block">
-              Retrieval-augmented document intelligence
+            <div className="flex items-center gap-1.5 leading-none">
+              <span className="font-display text-sm font-bold tracking-tight text-ink-primary sm:text-base">
+                ASKMYDOCS
+              </span>
+              <span className="font-display text-sm font-bold text-amber-primary sm:text-base">
+                AI
+              </span>
+            </div>
+            <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-muted sm:text-[11px]">
+              Retrieval-Augmented Document Intelligence
             </p>
           </div>
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-4">
-        <div className="hidden items-center gap-4 xl:flex">
-          <div className="text-right">
-            <p className="text-data text-base font-semibold text-champagne-300">{documents.length}</p>
-            <p className="text-[11px] uppercase tracking-wider text-ink-400">Documents</p>
+      {/* Center/Right: Subtle Header Stats & User Profile */}
+      <div className="flex items-center gap-3 sm:gap-6">
+        {/* Subtle Stats Pills */}
+        <div className="hidden items-center gap-5 md:flex">
+          <div className="flex items-center gap-2">
+            <FileText className="h-3.5 w-3.5 text-ink-muted" />
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-ink-muted">Documents</span>
+              <span className="text-data text-xs font-semibold text-ink-primary">{documents.length}</span>
+            </div>
           </div>
-          <span className="h-8 w-px bg-white/10" />
-          <div className="text-right">
-            <p className="text-data text-base font-semibold text-champagne-300">{formatNumber(totalChunks)}</p>
-            <p className="text-[11px] uppercase tracking-wider text-ink-400">Vectors</p>
+
+          <div className="h-3.5 w-px bg-white/10" />
+
+          <div className="flex items-center gap-2">
+            <Layers className="h-3.5 w-3.5 text-ink-muted" />
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-ink-muted">Chunks</span>
+              <span className="text-data text-xs font-semibold text-ink-primary">{formatNumber(totalChunks)}</span>
+            </div>
           </div>
-          <span className="h-8 w-px bg-white/10" />
-          <div className="text-right">
-            <p className="text-data text-base font-semibold text-ink-200">{userId}</p>
-            <p className="text-[11px] uppercase tracking-wider text-ink-400">Identity</p>
+
+          <div className="h-3.5 w-px bg-white/10" />
+
+          <div className="flex items-center gap-2">
+            <MessagesSquare className="h-3.5 w-3.5 text-ink-muted" />
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-ink-muted">Conversations</span>
+              <span className="text-data text-xs font-semibold text-ink-primary">{sessions.length}</span>
+            </div>
           </div>
+        </div>
+
+        <div className="h-4 w-px bg-white/10 hidden sm:block" />
+
+        {/* User Avatar & Online Status */}
+        <div className="flex items-center gap-2.5 rounded-lg border border-card-border bg-card/60 px-2.5 py-1.5 text-xs text-ink-secondary">
+          <div className="relative flex h-6 w-6 items-center justify-center rounded-full border border-amber-primary/30 bg-amber-500/10 text-amber-primary">
+            <User className="h-3 w-3" />
+            <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-bg-primary bg-success" />
+          </div>
+          <span className="hidden font-mono text-[11px] font-medium text-ink-primary sm:inline">
+            user_teogorw2
+          </span>
+          <ChevronDown className="h-3 w-3 text-ink-muted" />
         </div>
 
         <HealthBadge />
