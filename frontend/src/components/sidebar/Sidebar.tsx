@@ -1,4 +1,4 @@
-import { FileText, History, Home, Layers, Plus, Settings, Sparkles, UploadCloud } from 'lucide-react';
+import { FileText, History, Home, Plus, Settings, UploadCloud } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { DocumentList } from './DocumentList';
 import { SessionList } from './SessionList';
@@ -8,9 +8,6 @@ export function Sidebar() {
   const activeTab = useAppStore((state) => state.activeTab);
   const setActiveTab = useAppStore((state) => state.setActiveTab);
   const setUploadModalOpen = useAppStore((state) => state.setUploadModalOpen);
-  const health = useAppStore((state) => state.health);
-
-  const isOnline = Boolean(health);
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
@@ -20,8 +17,8 @@ export function Sidebar() {
   ] as const;
 
   return (
-    <aside className="card-premium flex h-full min-h-0 w-full flex-col justify-between rounded-2xl p-4">
-      <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden">
+    <aside className="card-premium flex h-full min-h-0 w-full flex-col justify-between rounded-2xl p-3.5 bg-[#11151C]/90 border border-white/[0.07]">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
         {/* Navigation Tabs */}
         <nav className="flex flex-col gap-1">
           {navItems.map((item) => {
@@ -34,22 +31,22 @@ export function Sidebar() {
                 type="button"
                 onClick={() => setActiveTab(item.id)}
                 className={cn(
-                  'relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-left text-sm font-medium transition-all duration-200',
+                  'relative flex items-center gap-3 rounded-xl px-3 py-2 text-left text-xs font-medium transition-all duration-200',
                   isActive
-                    ? 'border border-amber-primary/30 bg-card-hover text-ink-primary shadow-amber-glow'
-                    : 'border border-transparent text-ink-secondary hover:bg-white/[0.03] hover:text-ink-primary',
+                    ? 'border border-amber-primary/30 bg-[#151A22] text-white shadow-[0_0_15px_rgba(245,166,35,0.15)]'
+                    : 'border border-transparent text-[#94A3B8] hover:bg-white/[0.03] hover:text-white',
                 )}
               >
                 {isActive && (
-                  <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-amber-primary shadow-amber-glow" />
+                  <span className="absolute inset-y-1.5 left-0 w-1 rounded-r-full bg-amber-primary shadow-[0_0_8px_rgba(245,166,35,0.8)]" />
                 )}
                 <Icon
                   className={cn(
                     'h-4 w-4 shrink-0 transition-colors',
-                    isActive ? 'text-amber-primary' : 'text-ink-muted',
+                    isActive ? 'text-amber-primary' : 'text-[#64748B]',
                   )}
                 />
-                <span>{item.label}</span>
+                <span className="truncate">{item.label}</span>
               </button>
             );
           })}
@@ -58,26 +55,26 @@ export function Sidebar() {
         <div className="h-px w-full bg-white/[0.06]" />
 
         {/* Scrollable Document & Session Lists */}
-        <div className="scrollbar-thin flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto pr-1">
+        <div className="scrollbar-thin flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
           <DocumentList onOpenUpload={() => setUploadModalOpen(true)} />
           <div className="h-px w-full bg-white/[0.06]" />
           <SessionList />
         </div>
       </div>
 
-      {/* Bottom: System Online Status Badge */}
-      <div className="mt-4 shrink-0 border-t border-card-border pt-3">
-        <div className="flex items-center justify-between rounded-xl border border-card-border bg-bg-secondary/60 px-3 py-2.5">
+      {/* Bottom: System Online Status Card */}
+      <div className="mt-3 shrink-0 border-t border-white/[0.06] pt-3">
+        <div className="flex items-center justify-between rounded-xl border border-white/[0.07] bg-[#0B0E13]/80 px-3 py-2">
           <div className="flex items-center gap-2.5">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success/60 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22C55E]/60 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#22C55E]" />
             </span>
             <div>
-              <p className="font-display text-[10px] font-bold uppercase tracking-[0.16em] text-ink-primary">
+              <p className="font-display text-[10px] font-bold uppercase tracking-[0.16em] text-white">
                 System Online
               </p>
-              <p className="text-data text-[11px] text-ink-muted">
+              <p className="text-data text-[11px] text-[#94A3B8]">
                 RAG Pipeline · Ready
               </p>
             </div>
@@ -85,7 +82,7 @@ export function Sidebar() {
           <button
             type="button"
             onClick={() => setUploadModalOpen(true)}
-            className="flex h-7 w-7 items-center justify-center rounded-lg border border-amber-primary/30 bg-amber-500/10 text-amber-primary transition-all hover:border-amber-primary hover:bg-amber-primary hover:text-bg-primary hover:shadow-amber-glow"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-amber-primary/30 bg-amber-500/10 text-amber-primary transition-all hover:border-amber-primary hover:bg-amber-primary hover:text-[#080A0D] shadow-[0_0_10px_rgba(245,166,35,0.2)]"
             title="Upload PDF"
             aria-label="Upload PDF"
           >

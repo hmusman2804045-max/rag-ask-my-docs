@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FileText, Loader2, Plus, Trash2, UploadCloud } from 'lucide-react';
+import { FileText, Loader2, Plus, Trash2 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { cn, formatNumber, truncateMiddle } from '@/lib/utils';
 
@@ -19,7 +19,7 @@ export function DocumentList({ onOpenUpload }: { onOpenUpload?: () => void }) {
   return (
     <section className="flex flex-col">
       <div className="flex items-center justify-between px-1">
-        <span className="font-display text-[10px] font-bold uppercase tracking-[0.18em] text-ink-muted">
+        <span className="font-display text-[10px] font-bold uppercase tracking-[0.18em] text-[#64748B]">
           Recent Documents
         </span>
         {documents.length > 0 && onOpenUpload && (
@@ -36,29 +36,29 @@ export function DocumentList({ onOpenUpload }: { onOpenUpload?: () => void }) {
 
       <div className="mt-2.5 space-y-1.5">
         {isLoading && documents.length === 0 && (
-          <div className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-ink-muted">
+          <div className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-[#94A3B8]">
             <Loader2 className="h-3.5 w-3.5 animate-spin text-amber-primary" />
             Loading knowledge base…
           </div>
         )}
 
         {!isLoading && documents.length === 0 && (
-          <div className="rounded-xl border border-dashed border-card-border bg-card/40 p-4 text-center">
-            <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-lg border border-amber-primary/20 bg-amber-500/10 text-amber-primary">
+          <div className="rounded-xl border border-dashed border-white/10 bg-[#0B0E13]/50 p-3.5 text-center">
+            <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#151A22] text-[#94A3B8]">
               <FileText className="h-4 w-4" />
             </div>
-            <p className="mt-2 text-xs font-semibold text-ink-primary">No documents yet</p>
-            <p className="mt-1 text-[11px] leading-relaxed text-ink-muted">
+            <p className="mt-2 text-xs font-semibold text-white">No documents yet</p>
+            <p className="mt-1 text-[10.5px] leading-relaxed text-[#94A3B8]">
               Upload your first PDF to build your knowledge base.
             </p>
             {onOpenUpload && (
               <button
                 type="button"
                 onClick={onOpenUpload}
-                className="btn-amber-primary mt-3 inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs"
+                className="btn-amber-primary mt-2.5 inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs"
               >
                 <Plus className="h-3.5 w-3.5" />
-                <span>Upload PDF</span>
+                <span>+ Upload PDF</span>
               </button>
             )}
           </div>
@@ -74,8 +74,8 @@ export function DocumentList({ onOpenUpload }: { onOpenUpload?: () => void }) {
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.18 }}
               className={cn(
-                'group relative rounded-xl border border-card-border bg-card/60 p-2.5 transition-all duration-200',
-                'hover:border-amber-primary/30 hover:bg-card-hover hover:shadow-card-subtle',
+                'group relative rounded-xl border border-white/[0.07] bg-[#11151C] p-2.5 transition-all duration-200',
+                'hover:border-amber-primary/30 hover:bg-[#151A22]',
                 pending === doc.doc_name && 'opacity-50',
               )}
             >
@@ -85,10 +85,10 @@ export function DocumentList({ onOpenUpload }: { onOpenUpload?: () => void }) {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-semibold text-ink-primary" title={doc.doc_name}>
-                    {truncateMiddle(doc.doc_name, 22)}
+                  <p className="truncate text-xs font-semibold text-white" title={doc.doc_name}>
+                    {truncateMiddle(doc.doc_name, 20)}
                   </p>
-                  <p className="mt-0.5 text-data text-[11px] text-ink-muted">
+                  <p className="mt-0.5 text-data text-[10.5px] text-[#94A3B8]">
                     {doc.page_count} {doc.page_count === 1 ? 'page' : 'pages'} · {doc.chunk_count} chunks
                   </p>
                 </div>
@@ -97,7 +97,7 @@ export function DocumentList({ onOpenUpload }: { onOpenUpload?: () => void }) {
                   type="button"
                   onClick={() => void handleDelete(doc.doc_name)}
                   disabled={pending === doc.doc_name}
-                  className="rounded-lg p-1 text-ink-muted opacity-0 transition-all hover:bg-rose-500/15 hover:text-rose-400 focus-visible:opacity-100 group-hover:opacity-100"
+                  className="rounded-lg p-1 text-[#64748B] opacity-0 transition-all hover:bg-rose-500/15 hover:text-rose-400 focus-visible:opacity-100 group-hover:opacity-100"
                   aria-label={`Delete ${doc.doc_name}`}
                   title="Delete document"
                 >

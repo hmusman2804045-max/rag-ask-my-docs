@@ -36,7 +36,7 @@ function Pill({ label, value, tone }: { label: string; value: string; tone: Tone
   return (
     <span
       className={cn(
-        'flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs',
+        'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs',
         tone === 'ok' && 'border-success/30 bg-success/10 text-success',
         tone === 'warn' && 'border-amber-primary/30 bg-amber-primary/10 text-amber-primary',
         tone === 'down' && 'border-rose-500/30 bg-rose-500/10 text-rose-400',
@@ -44,8 +44,8 @@ function Pill({ label, value, tone }: { label: string; value: string; tone: Tone
       )}
     >
       <StatusDot tone={tone} />
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-ink-muted">{label}</span>
-      <span className="text-data font-medium">{value}</span>
+      <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-wider text-ink-muted">{label}</span>
+      <span className="whitespace-nowrap text-data font-medium">{value}</span>
     </span>
   );
 }
@@ -90,40 +90,40 @@ export function HealthBadge() {
   const groqTone: Tone = !online ? 'down' : liveMode ? 'ok' : 'warn';
 
   return (
-    <div className="relative">
+    <div className="relative shrink-0">
       <div className="flex items-center gap-2">
-        {/* Full status pills once the header has room for them. */}
+        {/* Full status pills once the header has room for them */}
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           aria-label="System health details"
-          className="hidden items-center gap-1.5 rounded-full border border-card-border bg-card/60 px-2 py-1 transition-colors hover:border-amber-primary/40 md:flex"
+          className="hidden shrink-0 items-center gap-1.5 rounded-full border border-card-border bg-[#11151C]/70 px-2 py-1 transition-colors hover:border-amber-primary/40 md:flex"
         >
           <Pill
-            label="Mongo"
+            label="MONGO"
             value={!online ? 'offline' : health?.mongodb_connected ? 'atlas' : 'fallback'}
             tone={mongoTone}
           />
           <Pill
-            label="Vector"
-            value={vectorCount === null ? '—' : `${formatNumber(vectorCount)} vec`}
+            label="VECTOR"
+            value={vectorCount === null ? '0 vec' : `${formatNumber(vectorCount)} vec`}
             tone={chromaTone}
           />
           <Pill
-            label="Groq"
+            label="GROQ"
             value={!online ? 'offline' : liveMode ? 'live' : 'mock'}
             tone={groqTone}
           />
         </button>
 
-        {/* Compact summary on narrow screens. */}
+        {/* Compact summary on narrow screens */}
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           className={cn(
-            'flex items-center gap-2 rounded-full border border-card-border bg-card/60 px-3 py-1.5 text-xs transition-colors md:hidden',
+            'flex shrink-0 items-center gap-2 rounded-full border border-card-border bg-[#11151C]/70 px-3 py-1.5 text-xs transition-colors md:hidden',
             online ? 'hover:border-amber-primary/40' : 'border-rose-500/30',
           )}
         >
@@ -141,7 +141,7 @@ export function HealthBadge() {
         <button
           type="button"
           onClick={() => void fetchHealth()}
-          className="rounded-full border border-card-border bg-card/60 p-2 text-ink-muted transition-colors hover:border-amber-primary/40 hover:text-amber-primary"
+          className="rounded-full border border-card-border bg-[#11151C]/70 p-2 text-ink-muted transition-colors hover:border-amber-primary/40 hover:text-amber-primary"
           aria-label="Refresh system health"
         >
           <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />

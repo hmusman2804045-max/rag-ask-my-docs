@@ -8,9 +8,9 @@ const PALETTE = {
   amber: '#F5A623',
   gold: '#FFB52E',
   softGold: '#D99A25',
-  cardBg: '#11151C',
+  cardBg: '#10141B',
   border: '#334155',
-  nodeBg: '#151A22',
+  emerald: '#22C55E',
 };
 
 interface PipelineNodeProps {
@@ -22,41 +22,42 @@ interface PipelineNodeProps {
   active?: boolean;
 }
 
-function PipelineNode({ label, sublabel, angle, radius, color = PALETTE.amber, active }: PipelineNodeProps) {
+function PipelineNode({ label, angle, radius, color = PALETTE.amber, active }: PipelineNodeProps) {
   const meshRef = useRef<THREE.Group>(null);
 
   useFrame(({ clock }) => {
     if (!meshRef.current) return;
-    const t = clock.getElapsedTime() * 0.15;
+    // Slow, stately rotation (approx 25s per cycle)
+    const t = clock.getElapsedTime() * 0.12;
     const currentAngle = angle + t;
     meshRef.current.position.x = Math.cos(currentAngle) * radius;
-    meshRef.current.position.z = Math.sin(currentAngle) * (radius * 0.55);
-    meshRef.current.position.y = Math.sin(currentAngle * 2) * 0.12;
+    meshRef.current.position.z = Math.sin(currentAngle) * (radius * 0.5);
+    meshRef.current.position.y = Math.sin(currentAngle * 2) * 0.1;
   });
 
   return (
     <group ref={meshRef}>
-      {/* Node Halo */}
-      <Sphere args={[0.16, 16, 16]}>
+      {/* Node Halo Sphere */}
+      <Sphere args={[0.13, 16, 16]}>
         <meshStandardMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={active ? 0.9 : 0.4}
+          emissiveIntensity={active ? 1.0 : 0.45}
           roughness={0.2}
           metalness={0.8}
         />
       </Sphere>
 
-      {/* Outer Ring */}
+      {/* Outer Rotating Ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.22, 0.25, 32]} />
+        <ringGeometry args={[0.18, 0.21, 32]} />
         <meshBasicMaterial color={color} opacity={0.35} transparent side={THREE.DoubleSide} />
       </mesh>
 
       {/* Floating Tag */}
-      <group position={[0, 0.35, 0]}>
+      <group position={[0, 0.28, 0]}>
         <Text
-          fontSize={0.13}
+          fontSize={0.11}
           color="#F5F7FA"
           anchorX="center"
           anchorY="middle"
@@ -75,41 +76,41 @@ function CentralDocumentCard({ active }: { active?: boolean }) {
   useFrame(({ clock, mouse }) => {
     if (!cardRef.current) return;
     const t = clock.getElapsedTime();
-    // Gentle floating & tilt
-    cardRef.current.rotation.y = Math.sin(t * 0.4) * 0.15 + mouse.x * 0.2;
-    cardRef.current.rotation.x = Math.cos(t * 0.3) * 0.08 - mouse.y * 0.15;
-    cardRef.current.position.y = Math.sin(t * 0.8) * 0.08;
+    // Subtle float & smooth mouse tilt
+    cardRef.current.rotation.y = Math.sin(t * 0.3) * 0.12 + mouse.x * 0.15;
+    cardRef.current.rotation.x = Math.cos(t * 0.25) * 0.06 - mouse.y * 0.12;
+    cardRef.current.position.y = 0.3 + Math.sin(t * 0.6) * 0.06;
   });
 
   return (
     <group ref={cardRef}>
       {/* 3D Glass Document Slate */}
       <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[1.5, 2.0, 0.06]} />
+        <boxGeometry args={[1.3, 1.7, 0.05]} />
         <meshPhysicalMaterial
-          color="#10141B"
-          metalness={0.6}
-          roughness={0.25}
-          transmission={0.3}
-          thickness={0.5}
-          clearcoat={0.8}
+          color="#0B0E13"
+          metalness={0.7}
+          roughness={0.2}
+          transmission={0.25}
+          thickness={0.4}
+          clearcoat={0.9}
         />
       </mesh>
 
       {/* Glowing Amber Border Frame */}
       <lineSegments>
-        <edgesGeometry args={[new THREE.BoxGeometry(1.51, 2.01, 0.062)]} />
-        <lineBasicMaterial color={PALETTE.gold} linewidth={1.5} transparent opacity={0.65} />
+        <edgesGeometry args={[new THREE.BoxGeometry(1.31, 1.71, 0.052)]} />
+        <lineBasicMaterial color={PALETTE.gold} linewidth={1.5} transparent opacity={0.7} />
       </lineSegments>
 
-      {/* Document Heading Text */}
-      <group position={[0, 0.55, 0.04]}>
+      {/* Document Header Text */}
+      <group position={[0, 0.45, 0.035]}>
         <Text
-          fontSize={0.14}
+          fontSize={0.11}
           color={PALETTE.gold}
           anchorX="center"
           anchorY="middle"
-          maxWidth={1.2}
+          maxWidth={1.1}
           font="https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_eeA.woff"
         >
           ASKMYDOCS AI
@@ -117,18 +118,18 @@ function CentralDocumentCard({ active }: { active?: boolean }) {
       </group>
 
       {/* Schematic Lines on Document Surface */}
-      {[-0.05, -0.25, -0.45, -0.65].map((y, idx) => (
-        <mesh key={idx} position={[0, y, 0.04]}>
-          <planeGeometry args={[1.1 - idx * 0.12, 0.03]} />
-          <meshBasicMaterial color="#334155" opacity={0.6} transparent />
+      {[-0.05, -0.22, -0.38, -0.54].map((y, idx) => (
+        <mesh key={idx} position={[0, y, 0.035]}>
+          <planeGeometry args={[0.9 - idx * 0.1, 0.025]} />
+          <meshBasicMaterial color="#334155" opacity={0.7} transparent />
         </mesh>
       ))}
 
-      {/* Central Emblem */}
-      <group position={[0, 0.2, 0.04]}>
+      {/* Central Diamond Emblem */}
+      <group position={[0, 0.15, 0.035]}>
         <mesh rotation={[0, 0, Math.PI / 4]}>
-          <planeGeometry args={[0.22, 0.22]} />
-          <meshBasicMaterial color={PALETTE.amber} opacity={0.8} transparent />
+          <planeGeometry args={[0.18, 0.18]} />
+          <meshBasicMaterial color={PALETTE.amber} opacity={0.85} transparent />
         </mesh>
       </group>
     </group>
@@ -138,29 +139,29 @@ function CentralDocumentCard({ active }: { active?: boolean }) {
 function OrbitalRings() {
   const points1 = useMemo(() => {
     const pts = [];
-    const radius = 2.4;
+    const radius = 2.2;
     for (let i = 0; i <= 64; i++) {
       const theta = (i / 64) * Math.PI * 2;
-      pts.push(new THREE.Vector3(Math.cos(theta) * radius, Math.sin(theta * 2) * 0.08, Math.sin(theta) * (radius * 0.55)));
+      pts.push(new THREE.Vector3(Math.cos(theta) * radius, 0.3 + Math.sin(theta * 2) * 0.06, Math.sin(theta) * (radius * 0.5)));
     }
     return pts;
   }, []);
 
   return (
     <group>
-      <Line points={points1} color={PALETTE.softGold} opacity={0.2} transparent lineWidth={1} />
+      <Line points={points1} color={PALETTE.softGold} opacity={0.25} transparent lineWidth={1} />
     </group>
   );
 }
 
-function AmbientParticles({ count = 40 }: { count?: number }) {
+function AmbientParticles({ count = 35 }: { count?: number }) {
   const particles = useMemo(() => {
     const temp = [];
     for (let i = 0; i < count; i++) {
-      const x = (Math.random() - 0.5) * 8;
-      const y = (Math.random() - 0.5) * 5;
+      const x = (Math.random() - 0.5) * 7;
+      const y = (Math.random() - 0.5) * 4;
       const z = (Math.random() - 0.5) * 4;
-      const scale = Math.random() * 0.04 + 0.015;
+      const scale = Math.random() * 0.03 + 0.012;
       temp.push({ position: [x, y, z] as [number, number, number], scale });
     }
     return temp;
@@ -170,14 +171,14 @@ function AmbientParticles({ count = 40 }: { count?: number }) {
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
-    groupRef.current.rotation.y = clock.getElapsedTime() * 0.02;
+    groupRef.current.rotation.y = clock.getElapsedTime() * 0.015;
   });
 
   return (
     <group ref={groupRef}>
       {particles.map((p, i) => (
         <Sphere key={i} args={[p.scale, 8, 8]} position={p.position}>
-          <meshBasicMaterial color={PALETTE.amber} opacity={0.35} transparent />
+          <meshBasicMaterial color={PALETTE.amber} opacity={0.3} transparent />
         </Sphere>
       ))}
     </group>
@@ -188,21 +189,21 @@ export function DocumentPipeline3D() {
   const activity = useAppStore((state) => state.activity);
 
   const pipelineNodes = [
-    { label: 'PDF Document', sublabel: 'Ingestion', angle: 0, radius: 2.4, color: '#F5A623' },
-    { label: 'Chunking', sublabel: 'LangChain', angle: (Math.PI * 2) / 5, radius: 2.4, color: '#FFB52E' },
-    { label: 'Embeddings', sublabel: 'FastEmbed 384d', angle: (Math.PI * 4) / 5, radius: 2.4, color: '#D99A25' },
-    { label: 'Vector Search', sublabel: 'MongoDB Atlas', angle: (Math.PI * 6) / 5, radius: 2.4, color: '#22C55E' },
-    { label: 'LLM Reasoning', sublabel: 'Groq LLaMA 3.3', angle: (Math.PI * 8) / 5, radius: 2.4, color: '#FFB52E' },
+    { label: 'PDF Document', sublabel: 'Ingestion', angle: 0, radius: 2.2, color: '#F5A623' },
+    { label: 'Chunking', sublabel: 'LangChain', angle: (Math.PI * 2) / 5, radius: 2.2, color: '#FFB52E' },
+    { label: 'Embeddings', sublabel: 'FastEmbed 384d', angle: (Math.PI * 4) / 5, radius: 2.2, color: '#D99A25' },
+    { label: 'Vector Search', sublabel: 'MongoDB Atlas', angle: (Math.PI * 6) / 5, radius: 2.2, color: '#22C55E' },
+    { label: 'LLM Reasoning', sublabel: 'Groq LLaMA 3.3', angle: (Math.PI * 8) / 5, radius: 2.2, color: '#FFB52E' },
   ];
 
   return (
-    <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.4}>
+    <Float speed={1.2} rotationIntensity={0.15} floatIntensity={0.3}>
       <CentralDocumentCard active={activity !== 'idle'} />
       <OrbitalRings />
       {pipelineNodes.map((node) => (
         <PipelineNode key={node.label} {...node} active={activity !== 'idle'} />
       ))}
-      <AmbientParticles count={35} />
+      <AmbientParticles count={30} />
     </Float>
   );
 }
